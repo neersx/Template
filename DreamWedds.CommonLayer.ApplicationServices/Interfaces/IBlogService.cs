@@ -8,7 +8,5 @@ namespace DreamWedds.CommonLayer.Application.Interfaces
 {
     public interface IBlogService
     {
-        Task<List<DreamWeddsBlogDTO>> GetAllBlogs();
-        Task<DreamWeddsBlogDTO> GetBlogById(int id);
     }
 }
