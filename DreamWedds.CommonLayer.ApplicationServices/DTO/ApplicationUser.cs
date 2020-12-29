@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using DreamWedds.CommonLayer.Application.Mappings;
+using DreamWedds.CommonLayer.Aspects.Security;
 using DreamWedds.PersistenceLayer.Entities.Common;
 using DreamWedds.PersistenceLayer.Entities.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -27,8 +28,14 @@ namespace DreamWedds.CommonLayer.Application.DTO
         public int CompanyId { get; set; }
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<UserMaster, ApplicationUser>();
-            profile.CreateMap<ApplicationUser, UserMaster>();
+            profile.CreateMap<UserMaster, ApplicationUser>()
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.Email)))
+                .ForMember(d => d.UserName, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.UserName)))
+                .ForMember(d => d.Password, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.Password)));
+            profile.CreateMap<ApplicationUser, UserMaster>()
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.Email)))
+                .ForMember(d => d.UserName, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.UserName)))
+                .ForMember(d => d.Password, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.Password)));
         }
     }
 

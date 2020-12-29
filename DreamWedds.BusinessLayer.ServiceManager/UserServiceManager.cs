@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamWedds.CommonLayer.Aspects.Security;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
-using Microsoft.AspNetCore.Http;
 
 namespace DreamWedds.BusinessLayer.ServiceManager
 {
@@ -14,18 +13,15 @@ namespace DreamWedds.BusinessLayer.ServiceManager
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserServiceManager( IUserRepository userPersistenceService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserServiceManager(IUserRepository userPersistenceService, IMapper mapper)
         {
             _mapper = mapper;
             _userRepository = userPersistenceService;
-            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ApplicationUser> GetUserAsync(int id)
         {
             var user = await _userRepository.GetUserAsync(id);
-            //var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
             return _mapper.Map<UserMaster, ApplicationUser>(user);
         }
 
