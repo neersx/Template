@@ -19,19 +19,19 @@ namespace DreamWedds.PersistenceLayer.Repository
         }
 
         public DbSet<AddressMaster> AddressMaster { get; set; }
-        public DbSet<UserMaster> UserMasters { get; set; }
-        public DbSet<RoleMaster> RoleMasters { get; set; }
+        public DbSet<UserMaster> UserMaster { get; set; }
+        public DbSet<RoleMaster> RoleMaster { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
         public DbSet<DailyLoginHistory> DailyLoginHistory { get; set; }
         public DbSet<LoginAttemptHistory> LoginAttemptHistory { get; set; }
         public DbSet<Permissions> Permissions { get; set; }
         public DbSet<UserRoleModulePermission> UserRoleModulePermission { get; set; }
         public DbSet<SystemSettings> SystemSettings { get; set; }
-        public DbSet<EmailService> EmailServices { get; set; }
+        public DbSet<EmailService> EmailService { get; set; }
         public DbSet<ContactUs> ContactUs { get; set; }
         public DbSet<OtpMaster> OtpMaster { get; set; }
         public DbSet<ErrorLog> ErrorLog { get; set; }
-        public DbSet<ModuleMaster> ModuleMasters { get; set; }
+        public DbSet<ModuleMaster> ModuleMaster { get; set; }
         public DbSet<CompanyMaster> CompanyMaster { get; set; }
         public DbSet<RoleModule> RoleModule { get; set; }
         public DbSet<CommonSetup> CommonSetup { get; set; }

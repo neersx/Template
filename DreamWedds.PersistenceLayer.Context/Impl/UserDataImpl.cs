@@ -36,8 +36,8 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
             //var specification = new UserFilterSpecification(userName, password);
             //return await _userRepository.AnyAsync(specification);
 
-            var user = await DbContext.UserMasters.FirstOrDefaultAsync(x => x.Email == userName && x.Password == password) ??
-                       await DbContext.UserMasters.FirstOrDefaultAsync(x => x.UserName == userName && x.Password == password);
+            var user = await DbContext.UserMaster.FirstOrDefaultAsync(x => x.Email == userName && x.Password == password) ??
+                       await DbContext.UserMaster.FirstOrDefaultAsync(x => x.UserName == userName && x.Password == password);
             return user;
         }
 
