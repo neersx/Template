@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace DreamWedds.PresentationLayer.WebApi.Model
+namespace AdminProject.PresentationLayer.WebApi.Model
 {
     public class AuthenticateResponse : BaseResponse
     {

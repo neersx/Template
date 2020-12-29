@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using AuthorizeAttribute = Microsoft.AspNetCore.Authorization.AuthorizeAttribute;
 
-namespace DreamWedds.PresentationLayer.WebApi.ApiControllers
+namespace AdminProject.PresentationLayer.WebApi.Controllers
 {
     [ApiController]   
     [Route("[controller]")]

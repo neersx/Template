@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamWedds.CommonLayer.Aspe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamWedds.CommonLayer.Infrastructure", "DreamWedds.CommonLayer.Infrastructure\DreamWedds.CommonLayer.Infrastructure.csproj", "{45B170D3-A177-4261-A67B-080A46F29683}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamWedds.PresentationLayer.WebApi", "DreamWedds.PresentationLayer.WebApi\DreamWedds.PresentationLayer.WebApi.csproj", "{887D96F8-8DDC-40D5-8B8D-125EFFA579F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminProject.PresentationLayer.WebApi", "AdminProject.PresentationLayer.WebApi\AdminProject.PresentationLayer.WebApi.csproj", "{FABE32CD-DDAE-4BC6-8F5E-E4FBD8F2EF17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +53,10 @@ Global
 		{45B170D3-A177-4261-A67B-080A46F29683}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45B170D3-A177-4261-A67B-080A46F29683}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45B170D3-A177-4261-A67B-080A46F29683}.Release|Any CPU.Build.0 = Release|Any CPU
-		{887D96F8-8DDC-40D5-8B8D-125EFFA579F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{887D96F8-8DDC-40D5-8B8D-125EFFA579F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{887D96F8-8DDC-40D5-8B8D-125EFFA579F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{887D96F8-8DDC-40D5-8B8D-125EFFA579F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FABE32CD-DDAE-4BC6-8F5E-E4FBD8F2EF17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FABE32CD-DDAE-4BC6-8F5E-E4FBD8F2EF17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FABE32CD-DDAE-4BC6-8F5E-E4FBD8F2EF17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FABE32CD-DDAE-4BC6-8F5E-E4FBD8F2EF17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

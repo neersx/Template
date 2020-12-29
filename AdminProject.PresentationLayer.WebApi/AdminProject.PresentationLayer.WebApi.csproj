@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>cf6af442-b892-4d69-a556-1866fca3b09a</UserSecretsId>
+    <AssemblyName>AdminProject.PresentationLayer.WebApi</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

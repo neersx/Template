@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using DreamWedds.CommonLayer.Application.Mappings;
 using DreamWedds.CommonLayer.Aspects.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace DreamWedds.PresentationLayer.WebApi.Model
+namespace AdminProject.PresentationLayer.WebApi.Model
 {
     public class LoginRequest : BaseRequest, IMapFrom<LoginRequest>
     {

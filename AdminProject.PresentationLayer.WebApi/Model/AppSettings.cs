@@ -1,4 +1,4 @@
-﻿namespace DreamWedds.PresentationLayer.WebApi.Model
+﻿namespace AdminProject.PresentationLayer.WebApi.Model
 {
     public class AppSettings
     {
