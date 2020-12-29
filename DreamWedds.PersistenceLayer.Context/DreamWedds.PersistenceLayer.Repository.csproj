@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>True</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Model\**" />
+    <EmbeddedResource Remove="Model\**" />
+    <None Remove="Model\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20200915144927_IdentityMigration.cs" />
+    <Compile Remove="Migrations\20200915144927_IdentityMigration.Designer.cs" />
+    <Compile Remove="Migrations\20200915180129_IdentityMigration.cs" />
+    <Compile Remove="Migrations\20200915180129_IdentityMigration.Designer.cs" />
+    <Compile Remove="Migrations\20200919200414_Identity.cs" />
+    <Compile Remove="Migrations\20200919200414_Identity.Designer.cs" />
+    <Compile Remove="Migrations\DreamWeddsDB\20201021182955_NewMigration.cs" />
+    <Compile Remove="Migrations\DreamWeddsDB\20201021182955_NewMigration.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.Specification" Version="3.0.0" />
+    <PackageReference Include="Devart.Data.PostgreSql.EFCore" Version="7.17.1686" />
+    <PackageReference Include="IdentityServer4.EntityFramework.Storage" Version="4.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DreamWedds.BusinessLayer.Services\DreamWedds.BusinessLayer.Services.csproj" />
+    <ProjectReference Include="..\DreamWedds.CommonLayer.ApplicationServices\DreamWedds.CommonLayer.Application.csproj" />
+    <ProjectReference Include="..\DreamWedds.PersistenceLayer.Entities\DreamWedds.PersistenceLayer.Entities.csproj" />
+  </ItemGroup>
+
+</Project>
