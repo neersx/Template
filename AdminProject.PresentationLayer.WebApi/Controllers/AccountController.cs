@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AdminProject.PresentationLayer.WebApi.Model;
 using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
-using DreamWedds.PresentationLayer.WebApi.Filters;
-using DreamWedds.PresentationLayer.WebApi.Model;
-using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace DreamWedds.PresentationLayer.WebApi.ApiControllers
+namespace AdminProject.PresentationLayer.WebApi.Controllers
 {
     [Route("api")]
     public class AccountController : ControllerBase

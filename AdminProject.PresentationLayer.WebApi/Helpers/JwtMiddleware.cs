@@ -1,16 +1,16 @@
-﻿using DreamWedds.CommonLayer.Application.Interfaces;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.Aspects.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DreamWedds.PresentationLayer.WebApi.Helpers
+namespace AdminProject.PresentationLayer.WebApi.Helpers
 {
     public class JwtMiddleware
     {
@@ -46,7 +46,6 @@ namespace DreamWedds.PresentationLayer.WebApi.Helpers
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
