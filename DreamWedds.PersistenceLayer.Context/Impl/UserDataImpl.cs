@@ -13,9 +13,9 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
     public class UserDataImpl : IUserRepository
     {
         private readonly IAsyncRepository<UserMaster> _userRepository;
-        protected readonly DreamWeddsDBContext DbContext;
+        protected readonly AdminDbContext DbContext;
 
-        public UserDataImpl(IAsyncRepository<UserMaster> userRepository, DreamWeddsDBContext context)
+        public UserDataImpl(IAsyncRepository<UserMaster> userRepository, AdminDbContext context)
         {
             _userRepository = userRepository;
             DbContext = context;

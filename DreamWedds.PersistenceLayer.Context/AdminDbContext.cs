@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Http;
 
 namespace DreamWedds.PersistenceLayer.Repository
 {
-    public class DreamWeddsDBContext : DbContext
+    public class AdminDbContext : DbContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public DreamWeddsDBContext(DbContextOptions<DreamWeddsDBContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
+        public AdminDbContext(DbContextOptions<AdminDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
         {
             _httpContextAccessor = httpContextAccessor;
         }

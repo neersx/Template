@@ -15,7 +15,7 @@ namespace DreamWedds.CommonLayer.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<DreamWeddsDBContext>(c =>
+            services.AddDbContext<AdminDbContext>(c =>
                 c.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(Repository<>));

@@ -6,8 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\DreamWeddsDB\**" />
     <Compile Remove="Model\**" />
+    <EmbeddedResource Remove="Migrations\DreamWeddsDB\**" />
     <EmbeddedResource Remove="Model\**" />
+    <None Remove="Migrations\DreamWeddsDB\**" />
     <None Remove="Model\**" />
   </ItemGroup>
 
@@ -18,8 +21,6 @@
     <Compile Remove="Migrations\20200915180129_IdentityMigration.Designer.cs" />
     <Compile Remove="Migrations\20200919200414_Identity.cs" />
     <Compile Remove="Migrations\20200919200414_Identity.Designer.cs" />
-    <Compile Remove="Migrations\DreamWeddsDB\20201021182955_NewMigration.cs" />
-    <Compile Remove="Migrations\DreamWeddsDB\20201021182955_NewMigration.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
