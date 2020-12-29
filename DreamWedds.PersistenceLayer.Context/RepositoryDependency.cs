@@ -12,7 +12,6 @@ namespace DreamWedds.PersistenceLayer.Repository
         {
             services.AddScoped(typeof(IAsyncRepository<>), typeof(Repository<>));
             services.AddScoped<IUserRepository, UserDataImpl>();
-            services.AddScoped<ITemplateRepository, TemplateDataImpl>();
             services.AddScoped<IEmailRepository, EmailDataImpl>();
         }
     }

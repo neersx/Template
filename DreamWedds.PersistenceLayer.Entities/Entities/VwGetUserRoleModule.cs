@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
-    public partial class VwGetUserRoleModule
+    public  class VwGetUserRoleModule
     {
         public int ModuleId { get; set; }
         public string Name { get; set; }

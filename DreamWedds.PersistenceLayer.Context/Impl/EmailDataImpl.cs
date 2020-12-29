@@ -11,9 +11,9 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
     public class EmailDataImpl : IEmailRepository
     {
         private readonly IAsyncRepository<ContactUs> _contactRepository;
-        protected readonly DreamWeddsDBContext DbContext;
+        protected readonly AdminDbContext DbContext;
 
-        public EmailDataImpl(IAsyncRepository<ContactUs> contactRepository, DreamWeddsDBContext context)
+        public EmailDataImpl(IAsyncRepository<ContactUs> contactRepository, AdminDbContext context)
         {
             DbContext = context;
             _contactRepository = contactRepository;

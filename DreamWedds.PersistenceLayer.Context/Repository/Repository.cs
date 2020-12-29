@@ -16,8 +16,8 @@ namespace DreamWedds.PersistenceLayer.Repository.Repository
 {
     public class Repository<T> : IAsyncRepository<T> where T : BaseEntity, IAggregateRoot
     {
-        protected readonly DreamWeddsDBContext _dbContext;
-        public Repository(DreamWeddsDBContext context)
+        protected readonly AdminDbContext _dbContext;
+        public Repository(AdminDbContext context)
         {
             _dbContext = context;
         }

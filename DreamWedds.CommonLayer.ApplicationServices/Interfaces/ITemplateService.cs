@@ -9,11 +9,6 @@ namespace DreamWedds.CommonLayer.Application.Interfaces
 {
     public interface ITemplateService
     {
-        Task<List<TemplateMasterDTO>> GetAllTemplates();
-        Task<List<TemplateMasterDTO>> GetWeddingTemplates();
-        Task<List<TemplateMasterDTO>> GetEmailTemplates();
-        Task<TemplateMasterDTO> GetTemplateById(int id);
-        Task<List<TemplateImagesDTO>> SubmitTemplateImages(List<TemplateImagesDTO> images);
         Task<List<CommonSetupDTO>> GetTemplateCommonSetup();
     }
 }
