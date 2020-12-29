@@ -5,7 +5,7 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
     public partial class ErrorLog
     {
-        public int LogId { get; set; }
+        public int Id { get; set; }
         public int? EventId { get; set; }
         public int Priority { get; set; }
         public int Severity { get; set; }

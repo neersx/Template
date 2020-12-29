@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
-    public partial class Otpmaster
+    public class OtpMaster
     {
-        public long OtpmasterId { get; set; }
+        public int Id { get; set; }
         public int UserId { get; set; }
         public string Otp { get; set; }
         public string Guid { get; set; }

@@ -6,13 +6,8 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
     public class CompanyMaster
     {
-        public CompanyMaster()
-        {
-            //SystemSettings = new HashSet<SystemSettings>();
-            //UserMaster = new HashSet<UserMaster>();
-        }
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
         public int DivisionId { get; set; }

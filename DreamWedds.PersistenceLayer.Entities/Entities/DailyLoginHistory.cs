@@ -5,7 +5,7 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
     public partial class DailyLoginHistory
     {
-        public long ID { get; set; }
+        public long Id { get; set; }
         public int? UserId { get; set; }
         public int? CustomerId { get; set; }
         public string SessionId { get; set; }

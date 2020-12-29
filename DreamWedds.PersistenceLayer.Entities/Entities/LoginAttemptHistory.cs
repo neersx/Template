@@ -5,7 +5,7 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
     public partial class LoginAttemptHistory
     {
-        public long LoginAttemptId { get; set; }
+        public long Id { get; set; }
         public int? FailedAttempt { get; set; }
         public int UserId { get; set; }
         public DateTime? LoginDate { get; set; }

@@ -11,12 +11,8 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
             public UserMaster()
             {
                 this.DailyLoginHistory = new HashSet<DailyLoginHistory>();
-                //this.LoginAttemptHistories = new HashSet<LoginAttemptHistory>();
-                //this.OrderMasters = new HashSet<OrderMaster>();
-                //this.UserDevices = new HashSet<UserDevice>();
+                this.LoginAttemptHistories = new HashSet<LoginAttemptHistory>();
                 this.UserRoles = new HashSet<UserRoles>();
-                //this.UserServiceAccesses = new HashSet<UserServiceAccess>();
-                //this.UserSystemSettings = new HashSet<UserSystemSetting>();
             }
 
         [Required]
@@ -36,11 +32,7 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
         public int CompanyId { get; set; }
         public CompanyMaster Company { get; set; }
         public virtual ICollection<DailyLoginHistory> DailyLoginHistory { get; set; }
-        //public virtual ICollection<LoginAttemptHistory> LoginAttemptHistory { get; set; }
-        //public virtual ICollection<OrderMaster> OrderMaster { get; set; }
-        //public virtual ICollection<UserDevices> UserDevices { get; set; }
+        public virtual ICollection<LoginAttemptHistory> LoginAttemptHistories { get; set; }
         public virtual ICollection<UserRoles> UserRoles { get; set; }
-        //public virtual ICollection<UserServiceAccess> UserServiceAccess { get; set; }
-        //public virtual ICollection<UserSystemSettings> UserSystemSettings { get; set; }
     }
 }
