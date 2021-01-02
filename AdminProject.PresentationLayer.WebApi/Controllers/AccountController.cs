@@ -57,7 +57,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserMasterDto>> Get(int id)
         {
             if (id == 0) return BadRequest();
@@ -77,7 +77,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpPost("user/add")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddNewUser([FromBody] UserMasterDto user)
         {
             if (user == null) return BadRequest();
@@ -111,7 +111,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpGet("user/remove/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> RemoveExistingUser(int id)
         {
             if (id == 0) return BadRequest();
@@ -128,7 +128,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpPost("user/assign-role")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AssignRoleToUser([FromBody] UserRolesDto roles)
         {
             if (roles == null) return BadRequest();
@@ -145,7 +145,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpGet("user/remove-role/{userId}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> RemoveRoleFromUser(int userId)
         {
             if (userId == 0) return BadRequest();
@@ -162,7 +162,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpGet("roles")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> GetRoles()
         {
             var item = await _userBusinessInstance.GetAllRolesAsync();

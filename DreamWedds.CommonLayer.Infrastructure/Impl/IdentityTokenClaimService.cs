@@ -7,22 +7,24 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using DreamWedds.PersistenceLayer.Repository.Repository;
 
 namespace DreamWedds.CommonLayer.Infrastructure.Impl
 {
     public class IdentityTokenClaimService : ITokenClaimsService
     {
-        private readonly IAsyncRepository<UserMaster> _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IAsyncRepository<RoleMaster> _roleRepository;
         private readonly IAsyncRepository<UserRoles> _userRoleRepository;
         private readonly IConfiguration _configuration;
         public IdentityTokenClaimService(
              IConfiguration configuration,
-            IAsyncRepository<UserMaster> userRepository,
+             IUserRepository userRepository,
             IAsyncRepository<RoleMaster> roleRepository,
             IAsyncRepository<UserRoles> userRoleRepository)
         {
@@ -36,7 +38,8 @@ namespace DreamWedds.CommonLayer.Infrastructure.Impl
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("AppSettings:Secret"));
-            var user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetUserAsync(id);
+            var role = await _userRepository.GetUserRolesAsync(id);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -44,7 +47,8 @@ namespace DreamWedds.CommonLayer.Infrastructure.Impl
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.MobilePhone, user.Mobile)
+                    new Claim(ClaimTypes.MobilePhone, user.Mobile),
+                    new Claim(ClaimTypes.Role, role.FirstOrDefault()?.Name)
                 }),
                 Expires = DateTime.UtcNow.AddSeconds(_configuration.GetValue<int>("Tokens:Lifetime")),
                 IssuedAt = DateTime.UtcNow,
@@ -59,7 +63,7 @@ namespace DreamWedds.CommonLayer.Infrastructure.Impl
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(AuthorizationConstants.JWT_SECRET_KEY);
-            var user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetUserAsync(id);
             var specification = new UserRoleFilterSpecification(id);
             var role = _roleRepository.GetByIdAsync(_userRoleRepository.FirstOrDefaultAsync(specification).Result.RoleId).Result.Name;
             var claims = new List<Claim> {
