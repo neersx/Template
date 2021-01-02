@@ -1,10 +1,7 @@
 ﻿using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.Aspects.Constants;
 using DreamWedds.PersistenceLayer.Entities.Entities;
-using DreamWedds.PersistenceLayer.Entities.Identity;
 using DreamWedds.PersistenceLayer.Entities.Specifications;
-using DreamWedds.PersistenceLayer.Infrastructure.Repository;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -13,7 +10,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.PersistenceLayer.Repository.Repository;
 
 namespace DreamWedds.CommonLayer.Infrastructure.Impl
@@ -43,7 +39,7 @@ namespace DreamWedds.CommonLayer.Infrastructure.Impl
             var user = await _userRepository.GetByIdAsync(id);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
+                Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
@@ -51,6 +47,8 @@ namespace DreamWedds.CommonLayer.Infrastructure.Impl
                     new Claim(ClaimTypes.MobilePhone, user.Mobile)
                 }),
                 Expires = DateTime.UtcNow.AddSeconds(_configuration.GetValue<int>("Tokens:Lifetime")),
+                IssuedAt = DateTime.UtcNow,
+                Issuer = "DreamWedds",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -76,7 +74,7 @@ namespace DreamWedds.CommonLayer.Infrastructure.Impl
                 Subject = new ClaimsIdentity(claims.ToArray()),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = "DreamWedds",
-                Expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Tokens:Lifetime")),
+                Expires = DateTime.UtcNow.AddSeconds(_configuration.GetValue<int>("Tokens:Lifetime")),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

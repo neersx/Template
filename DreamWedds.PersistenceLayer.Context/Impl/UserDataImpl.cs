@@ -1,10 +1,8 @@
 ﻿using DreamWedds.PersistenceLayer.Entities.Entities;
-using DreamWedds.PersistenceLayer.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using DreamWedds.PersistenceLayer.Infrastructure;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using DreamWedds.PersistenceLayer.Repository.Repository;
 
@@ -13,12 +11,19 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
     public class UserDataImpl : IUserRepository
     {
         private readonly IAsyncRepository<UserMaster> _userRepository;
-        protected readonly AdminDbContext DbContext;
+        private readonly AdminDbContext _dbContext;
+        private readonly IAsyncRepository<UserRoles> _userRoleRepository;
+        private readonly IAsyncRepository<RoleMaster> _roleRepository;
 
-        public UserDataImpl(IAsyncRepository<UserMaster> userRepository, AdminDbContext context)
+        public UserDataImpl(IAsyncRepository<UserMaster> userRepository,
+            IAsyncRepository<UserRoles> userRoleRepository,
+            IAsyncRepository<RoleMaster> roleRepository,
+            AdminDbContext context)
         {
             _userRepository = userRepository;
-            DbContext = context;
+            _roleRepository = roleRepository;
+            _userRoleRepository = userRoleRepository;
+            _dbContext = context;
         }
 
         public async Task<IReadOnlyList<UserMaster>> GetAllUsers()
@@ -26,9 +31,9 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
             return await _userRepository.ListAllAsync();
         }
 
-        public UserMaster GetById(int id)
+        public async Task<UserMaster> GetById(int id)
         {
-            throw new NotImplementedException();
+            return await _userRepository.GetByIdAsync(id);
         }
 
         public async Task<UserMaster> AuthenticateUser(string userName, string password)
@@ -36,8 +41,8 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
             //var specification = new UserFilterSpecification(userName, password);
             //return await _userRepository.AnyAsync(specification);
 
-            var user = await DbContext.UserMaster.FirstOrDefaultAsync(x => x.Email == userName && x.Password == password) ??
-                       await DbContext.UserMaster.FirstOrDefaultAsync(x => x.UserName == userName && x.Password == password);
+            var user = await _dbContext.UserMaster.FirstOrDefaultAsync(x => x.Email == userName && x.Password == password) ??
+                       await _dbContext.UserMaster.FirstOrDefaultAsync(x => x.UserName == userName && x.Password == password);
             return user;
         }
 
@@ -51,15 +56,89 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
             return await _userRepository.GetNameByIdAsync(userId);
         }
 
-
-        public void Remove(int id)
+        public async Task<int> AddNewUserAsync(UserMaster user)
         {
-            throw new NotImplementedException();
+            var newUser = await _userRepository.AddAsync(user);
+            return newUser.Id;
         }
 
-        public void Save(UserMaster obj)
+        public async Task UpdateUserAsync(UserMaster user)
         {
-            throw new NotImplementedException();
+            var u = await _userRepository.GetByIdAsync(user.Id);
+            u.FirstName = user.FirstName;
+            u.LastName = user.LastName;
+            u.AccountStatus = user.AccountStatus;
+            u.Mobile = user.Mobile;
+            u.Phone = user.Phone;
+            u.Password = user.Password;
+            u.Email = user.Email;
+            u.UserName = user.UserName;
+            u.Image = user.Image;
+            u.IsEmployee = user.IsEmployee;
+            u.EmpCode = user.EmpCode;
+            await _userRepository.UpdateAsync(u);
+        }
+
+        public async Task<int> AssignRoleToUser(UserRoles userRole)
+        {
+            userRole.IsActive = true;
+            var ur = await _userRoleRepository.AddAsync(userRole);
+            return ur.Id;
+        }
+
+        public async Task RevokeRoleFromUser(int userId)
+        {
+            var r = await _dbContext.UserRoles.Where(x => x.UserId == userId).ToListAsync();
+            if (r.Count > 0)
+            {
+                foreach (var item in r)
+                {
+                    item.IsActive = false;
+                    item.IsDeleted = true;
+                    await _userRoleRepository.UpdateAsync(item);
+                }
+            }
+        }
+
+        public async Task<IReadOnlyList<RoleMaster>> GetUserRolesAsync(int userId)
+        {
+            var result = await (from ur in _dbContext.UserRoles
+                                join r in _dbContext.RoleMaster on ur.RoleId equals r.Id
+                                where ur.UserId == userId
+                                select new RoleMaster
+                                {
+                                    RoleDescription = r.RoleDescription,
+                                    IsAdmin = r.IsAdmin,
+                                    Name = r.Name
+                                }).ToListAsync();
+
+            return result;
+        }
+
+        public async Task<IReadOnlyList<RoleMaster>> GetAllRolesAsync()
+        {
+            return await _roleRepository.ListAllAsync();
+        }
+
+        public async Task<RoleMaster> GetRoleByIdAsync(int id)
+        {
+            return await _roleRepository.GetByIdAsync(id);
+        }
+
+        public async Task<int> AddNewRoleAsync(RoleMaster role)
+        {
+            var newRole = await _roleRepository.AddAsync(role);
+            return newRole.Id;
+        }
+
+        public async Task UpdateRoleAsync(RoleMaster role)
+        {
+            var r = await _roleRepository.GetByIdAsync(role.Id);
+            r.RoleDescription = role.RoleDescription;
+            r.Name = role.Name;
+            r.IsAdmin = role.IsAdmin;
+            r.Code = role.Code;
+            await _roleRepository.UpdateAsync(r);
         }
     }
 }

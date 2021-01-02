@@ -8,13 +8,14 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
     public class UserMaster : BaseEntity, IAggregateRoot
     {
-            public UserMaster()
-            {
-                this.DailyLoginHistory = new HashSet<DailyLoginHistory>();
-                this.LoginAttemptHistories = new HashSet<LoginAttemptHistory>();
-                this.UserRoles = new HashSet<UserRoles>();
-            }
-
+        public UserMaster()
+        {
+            this.DailyLoginHistory = new HashSet<DailyLoginHistory>();
+            this.LoginAttemptHistories = new HashSet<LoginAttemptHistory>();
+            this.UserRoles = new HashSet<UserRoles>();
+        }
+        [Key]
+        public override int Id { get; set; }
         [Required]
         public string FirstName { get; set; }
         public string LastName { get; set; }

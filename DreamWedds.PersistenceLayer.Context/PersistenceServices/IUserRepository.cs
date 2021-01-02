@@ -10,5 +10,16 @@ namespace DreamWedds.PersistenceLayer.Repository.PersistenceServices
         Task<UserMaster> GetUserAsync(int id);
         Task<IReadOnlyList<UserMaster>> GetAllUsers();
         Task<UserMaster> AuthenticateUser(string userName, string password);
+        Task<int> AddNewUserAsync(UserMaster user);
+        Task UpdateUserAsync(UserMaster user);
+
+        Task<int> AssignRoleToUser(UserRoles userRole);
+        Task RevokeRoleFromUser(int userId);
+        Task<IReadOnlyList<RoleMaster>> GetUserRolesAsync(int userId);
+
+        Task<IReadOnlyList<RoleMaster>> GetAllRolesAsync();
+        Task<RoleMaster> GetRoleByIdAsync(int id);
+        Task<int> AddNewRoleAsync(RoleMaster role);
+        Task UpdateRoleAsync(RoleMaster role);
     }
 }

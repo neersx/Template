@@ -1,8 +1,5 @@
 ﻿using DreamWedds.CommonLayer.Application.DTO;
-using DreamWedds.CommonLayer.Aspects.Models;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DreamWedds.CommonLayer.Application.Interfaces
@@ -10,8 +7,20 @@ namespace DreamWedds.CommonLayer.Application.Interfaces
     public interface IUserService
     {
         Task<string> GetUserNameAsync(int userId);
-        Task<ApplicationUser> GetUserAsync(int userId);
-        Task<ApplicationUser> AuthenticateUser(string userName, string Password);
-        Task<List<ApplicationUser>> GetAllUsers();
+        Task<UserMasterDto> GetUserAsync(int userId);
+        Task<UserMasterDto> AuthenticateUser(string userName, string password);
+        Task<List<UserMasterDto>> GetAllUsers();
+        Task<int> AddNewUserAsync(UserMasterDto user);
+        Task UpdateUserAsync(UserMasterDto user);
+        Task RemoveUserAsync(int id);
+
+        Task<int> AssignRoleToUser(UserRolesDto userRole);
+        Task RevokeRoleFromUser(int userId);
+        Task<IReadOnlyList<RoleMasterDto>> GetUserRolesAsync(int userId);
+
+        Task<IReadOnlyList<RoleMasterDto>> GetAllRolesAsync();
+        Task<RoleMasterDto> GetRoleByIdAsync(int id);
+        Task<int> AddNewRoleAsync(RoleMasterDto role);
+        Task UpdateRoleAsync(RoleMasterDto role);
     }
 }

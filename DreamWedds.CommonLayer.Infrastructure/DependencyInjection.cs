@@ -22,8 +22,7 @@ namespace DreamWedds.CommonLayer.Infrastructure
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<IUserService, UserServiceManager>();
             services.AddRepositoryDependency();
-            services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
-
+            services.AddTransient<ITokenClaimsService, IdentityTokenClaimService>();
             services.AddTransient<IEmailService, EmailServiceManager>();
            
             return services;
