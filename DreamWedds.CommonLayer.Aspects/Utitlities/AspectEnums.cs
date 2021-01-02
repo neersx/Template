@@ -193,8 +193,8 @@ namespace DreamWedds.CommonLayer.Aspects.Utitlities
         {
             Pending = 0,
             Active = 1,
-            InActive = 2
-
+            InActive = 2,
+            Deleted = 3
         }
 
         /// <summary>

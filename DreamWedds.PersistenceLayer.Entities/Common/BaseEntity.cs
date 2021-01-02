@@ -1,15 +1,17 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DreamWedds.PersistenceLayer.Entities.Common
 {
     public class BaseEntity
     {
         [Key]
-        public virtual int Id { get; protected set; }
-        public bool IsDeleted { get; set; } = false;
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public virtual int Id { get; set; }
+        public bool IsDeleted { get; set; }
         public int CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }

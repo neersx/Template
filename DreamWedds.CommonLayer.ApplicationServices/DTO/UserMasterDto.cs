@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using AutoMapper;
 using DreamWedds.CommonLayer.Application.Mappings;
 using DreamWedds.CommonLayer.Aspects.Security;
 using DreamWedds.PersistenceLayer.Entities.Common;
 using DreamWedds.PersistenceLayer.Entities.Entities;
-using Microsoft.AspNetCore.Identity;
 
 namespace DreamWedds.CommonLayer.Application.DTO
 {
-    public class ApplicationUser : IMapFrom<UserMaster>
+    public class UserMasterDto : BaseEntity, IMapFrom<UserMaster>
     {
-        public int Id { get; protected set; }
         [Required]
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -26,13 +25,14 @@ namespace DreamWedds.CommonLayer.Application.DTO
         public string Phone { get; set; }
         public string Mobile { get; set; }
         public int CompanyId { get; set; }
+        public int RoleId { get; set; }
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<UserMaster, ApplicationUser>()
+            profile.CreateMap<UserMaster, UserMasterDto>()
                 .ForMember(d => d.Email, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.Email)))
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.UserName)))
                 .ForMember(d => d.Password, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.Password)));
-            profile.CreateMap<ApplicationUser, UserMaster>()
+            profile.CreateMap<UserMasterDto, UserMaster>()
                 .ForMember(d => d.Email, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.Email)))
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.UserName)))
                 .ForMember(d => d.Password, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.Password)));
