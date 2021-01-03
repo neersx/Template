@@ -1,9 +1,13 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
+using DreamWedds.CommonLayer.Aspects.Utitlities;
 using DreamWedds.PersistenceLayer.Entities.Entities;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using MailKit.Net.Smtp;
@@ -34,14 +38,50 @@ namespace DreamWedds.BusinessLayer.ServiceManager
             return _emailRepository.SubmitContactUs(_mapper.Map<ContactUsDTO, ContactUs>(model));
         }
 
-        public async Task PrepareAndSendEmailAsync(UserMasterDto user, string otherText)
+        public async Task PrepareAndSendEmailAsync(UserMasterDto user, string otherText, AspectEnums.TemplateType type, AspectEnums.EmailTemplateCode? code)
         {
-            var email = PrepareEmailBody(user, otherText);
+            var template = await _emailRepository.GetEmailWithFieldsAsync(type, code);
+            var email = PrepareEmailBody(user, otherText, template);
             await SendEmailAsync(email);
         }
 
-        private EmailsDto PrepareEmailBody(UserMasterDto user, string otherText)
+        public async Task<EmailTemplateDto> GetEmailTemplateAsync(AspectEnums.TemplateType type, AspectEnums.EmailTemplateCode? code)
         {
+            var template = await _emailRepository.GetEmailWithFieldsAsync(type, code);
+            return _mapper.Map<EmailTemplate, EmailTemplateDto>(template);
+        }
+
+        private EmailsDto PrepareEmailBody(UserMasterDto user, string uniqueText, EmailTemplate template)
+        {
+            StringBuilder body = new StringBuilder(template.HtmlContent);
+            var fields = template.EmailMergeFields;
+            foreach (var item in fields)
+            {
+                switch (item.SrcField)
+                {
+                    case "FNAME":
+                        item.SrcFieldValue ??= user.FirstName;
+                        body.Replace("{{FNAME}}", item.SrcFieldValue);
+                        break;
+                    case "LNAME":
+                        item.SrcFieldValue ??= user.LastName;
+                        body.Replace("{{FNAME}}", item.SrcFieldValue);
+                        break;
+                    case "EMAIL":
+                        item.SrcFieldValue ??= user.Email;
+                        body.Replace("{{EMAIL}}", item.SrcFieldValue);
+                        break;
+                    case "UNIQUESTR":
+                        item.SrcFieldValue ??= uniqueText;
+                        body.Replace("{{UNIQUESTR}}", item.SrcFieldValue);
+                        break;
+                    case "COMPANY":
+                        item.SrcFieldValue ??= uniqueText;
+                        body.Replace("{{COMPANY}}", item.SrcFieldValue);
+                        break;
+                }
+            }
+
             return new EmailsDto
             {
                 FromEmail = _smtpSettings.SenderEmail,
@@ -49,10 +89,10 @@ namespace DreamWedds.BusinessLayer.ServiceManager
                 ToEmail = user.Email,
                 ToName = user.FirstName,
                 Mobile = user.Mobile,
-                Message = "Test email for forget password.",
-                Body = "Tes body of email" + " " + otherText,
+                Message = body.ToString(),
+                Body = body.ToString(),
                 AttachmentFileName = "Attachment",
-                Subject = "Test email"
+                Subject = template.Subject
             };
         }
 

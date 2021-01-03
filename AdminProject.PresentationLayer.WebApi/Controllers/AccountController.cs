@@ -58,7 +58,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpPost("forget-password")]
-        public async Task<ActionResult<JsonResponse<UserMasterDto>>> ForgetPasswordNotification([FromBody]LoginModel model)
+        public async Task<ActionResult<JsonResponse<UserMasterDto>>> ForgetPasswordNotification([FromBody] LoginModel model)
         {
             var response = new JsonResponse<UserMasterDto>();
             if (string.IsNullOrEmpty(model.Email))
@@ -70,7 +70,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
                 if (user == null) return response;
                 if (!SaveOtp(user.Id, out var uniqueString)) return response;
 
-                await _emailService.PrepareAndSendEmailAsync(user, uniqueString);
+                await _emailService.PrepareAndSendEmailAsync(user, uniqueString, AspectEnums.TemplateType.ResetPassword, null);
                 response.IsSuccess = true;
                 response.SingleResult = user;
                 response.StatusCode = 200;

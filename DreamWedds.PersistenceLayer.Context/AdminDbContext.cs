@@ -34,6 +34,8 @@ namespace DreamWedds.PersistenceLayer.Repository
         public DbSet<CompanyMaster> CompanyMaster { get; set; }
         public DbSet<RoleModule> RoleModule { get; set; }
         public DbSet<CommonSetup> CommonSetup { get; set; }
+        public DbSet<EmailTemplate> EmailTemplate { get; set; }
+        public DbSet<EmailMergeFields> EmailMergeFields { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
