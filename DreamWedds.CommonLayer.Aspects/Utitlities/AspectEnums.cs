@@ -871,8 +871,8 @@ namespace DreamWedds.CommonLayer.Aspects.Utitlities
         }
         public enum TemplateType
         {
-            Email = 1,
-            Wedding = 2,
+            Register = 1,
+            ResetPassword = 2,
             AutoReply = 3,
             Marketing = 4
         }

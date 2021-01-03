@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using AutoMapper;
+using DreamWedds.CommonLayer.Application.Mappings;
+using DreamWedds.PersistenceLayer.Entities.Entities;
+using Microsoft.AspNetCore.Http;
 
-namespace DreamWedds.PersistenceLayer.Entities.Entities
+namespace DreamWedds.CommonLayer.Application.DTO
 {
-    public class EmailService
+    public class EmailsDto : IMapFrom<EmailService>
     {
         public long Id { get; set; }
         public int TemplateId { get; set; }
@@ -24,7 +29,14 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
         public bool IsAttachment { get; set; }
         public DateTime CreatedDate { get; set; }
         public string AttachmentFileName { get; set; }
+        public List<IFormFile> Attachments { get; set; }
         public string Remarks { get; set; }
         public int? TemplateCode { get; set; }
+
+        public void Mapping(Profile profile)
+        {
+            profile.CreateMap<EmailService, EmailsDto>();
+            profile.CreateMap<EmailsDto, EmailService>();
+        }
     }
 }
