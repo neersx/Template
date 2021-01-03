@@ -26,6 +26,13 @@ namespace DreamWedds.BusinessLayer.ServiceManager
             return _mapper.Map<UserMaster, UserMasterDto>(user);
         }
 
+        public async Task<UserMasterDto> GetUserByEmailAsync(LoginModel model)
+        {
+            model = _mapper.Map<LoginModel, LoginModel>(model);
+            var user = await _userRepository.GetUserByEmailAsync(model.Email);
+            return _mapper.Map<UserMaster, UserMasterDto>(user);
+        }
+
         public async Task<UserMasterDto> AuthenticateUser(string userName, string password)
         {
             userName = EncryptionEngine.EncryptString(userName);

@@ -5,6 +5,7 @@ using AdminProject.PresentationLayer.WebApi.Helpers;
 using AdminProject.PresentationLayer.WebApi.Model;
 using DreamWedds.BusinessLayer.Services;
 using DreamWedds.CommonLayer.Application;
+using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Aspects.Helpers;
 using DreamWedds.CommonLayer.Infrastructure;
 using DreamWedds.PresentationLayer.WebApi.Services;
@@ -44,12 +45,9 @@ namespace AdminProject.PresentationLayer.WebApi
             }));
 
             #endregion
-
+            services.Configure<SmtpSettings>(Configuration.GetSection(nameof(SmtpSettings)));
             services.Configure<Encryption>(Configuration.GetSection(nameof(Encryption)));
             services.AddSingleton(resolver => resolver.GetRequiredService<IOptionsMonitor<Encryption>>().CurrentValue);
-            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
-
-            // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 

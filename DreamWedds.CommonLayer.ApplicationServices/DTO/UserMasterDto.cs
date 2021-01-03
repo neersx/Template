@@ -8,6 +8,25 @@ using DreamWedds.PersistenceLayer.Entities.Entities;
 
 namespace DreamWedds.CommonLayer.Application.DTO
 {
+
+    public class LoginModel : IMapFrom<LoginModel>
+    {
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+
+        public void Mapping(Profile profile)
+        {
+            profile.CreateMap<LoginModel, LoginModel>()
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.Email)))
+                .ForMember(d => d.UserName, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.UserName)))
+                .ForMember(d => d.Password, opt => opt.MapFrom(s => EncryptionEngine.DecryptString(s.Password)));
+            profile.CreateMap<LoginModel, LoginModel>()
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.Email)))
+                .ForMember(d => d.UserName, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.UserName)))
+                .ForMember(d => d.Password, opt => opt.MapFrom(s => EncryptionEngine.EncryptString(s.Password)));
+        }
+    }
     public class UserMasterDto : BaseEntity, IMapFrom<UserMaster>
     {
         [Required]

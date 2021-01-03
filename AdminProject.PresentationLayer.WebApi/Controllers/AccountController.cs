@@ -16,14 +16,17 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         private readonly ITokenClaimsService _tokenClaimsService;
         private readonly IUserService _userBusinessInstance;
         private readonly IConfiguration _config;
+        private readonly IEmailService _emailService;
 
         public AccountController(IUserService userBusinessInstance,
             ITokenClaimsService tokenClaimsService,
-            IConfiguration config)
+            IConfiguration config,
+            IEmailService emailService)
         {
             _tokenClaimsService = tokenClaimsService;
             _userBusinessInstance = userBusinessInstance;
             _config = config;
+            _emailService = emailService;
         }
 
         [HttpPost("token")]
@@ -50,10 +53,51 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
                 {
                     return BadRequest(ex);
                 }
-
             }
             return BadRequest(ModelState);
+        }
 
+        [HttpPost("forget-password")]
+        public async Task<ActionResult<JsonResponse<UserMasterDto>>> ForgetPasswordNotification([FromBody]LoginModel model)
+        {
+            var response = new JsonResponse<UserMasterDto>();
+            if (string.IsNullOrEmpty(model.Email))
+                return BadRequest();
+            try
+            {
+                var user = await _userBusinessInstance.GetUserByEmailAsync(model);
+
+                if (user == null) return response;
+                if (!SaveOtp(user.Id, out var uniqueString)) return response;
+
+                await _emailService.PrepareAndSendEmailAsync(user, uniqueString);
+                response.IsSuccess = true;
+                response.SingleResult = user;
+                response.StatusCode = 200;
+                response.Message = "You account has been reset. Please check your registered email for rest password link.";
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                response.StatusCode = 500;
+                response.IsSuccess = false;
+                response.Message = "Error occured: " + e.Message;
+            }
+            return response;
+        }
+
+        private bool SaveOtp(int userId, out string uniqueString)
+        {
+            #region Prepare OTP Data
+
+            uniqueString = AppUtil.GetUniqueGuidString();
+            string otpString = AppUtil.GetUniqueRandomNumber(100000, 999999); // Generate a Six Digit OTP
+            _ = new OTPDto { Guid = uniqueString, Otp = otpString, CreatedDate = DateTime.Now, UserId = userId, Attempts = 0 };
+
+            //return SecurityBusinessInstance.SaveOTP(objOTP);
+            #endregion
+
+            return true;
         }
 
         [HttpGet]

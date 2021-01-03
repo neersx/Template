@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DreamWedds.PersistenceLayer.Entities.Specifications;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using DreamWedds.PersistenceLayer.Repository.Repository;
 
@@ -38,9 +39,6 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
 
         public async Task<UserMaster> AuthenticateUser(string userName, string password)
         {
-            //var specification = new UserFilterSpecification(userName, password);
-            //return await _userRepository.AnyAsync(specification);
-
             var user = await _dbContext.UserMaster.FirstOrDefaultAsync(x => x.Email == userName && x.Password == password) ??
                        await _dbContext.UserMaster.FirstOrDefaultAsync(x => x.UserName == userName && x.Password == password);
             return user;
@@ -49,6 +47,13 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
         public async Task<UserMaster> GetUserAsync(int id)
         {
             return await _userRepository.GetByIdAsync(id);
+        }
+
+        public async Task<UserMaster> GetUserByEmailAsync(string email)
+        {
+            var specification = new UserFilterSpecification(email);
+            var user = await _userRepository.FirstAsync(specification);
+            return user;
         }
 
         public async Task<string> GetUserNameAsync(int userId)

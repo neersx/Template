@@ -8,6 +8,7 @@ namespace DreamWedds.CommonLayer.Application.Interfaces
     {
         Task<string> GetUserNameAsync(int userId);
         Task<UserMasterDto> GetUserAsync(int userId);
+        Task<UserMasterDto> GetUserByEmailAsync(LoginModel model);
         Task<UserMasterDto> AuthenticateUser(string userName, string password);
         Task<List<UserMasterDto>> GetAllUsers();
         Task<int> AddNewUserAsync(UserMasterDto user);

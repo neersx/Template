@@ -8,6 +8,7 @@ namespace DreamWedds.PersistenceLayer.Repository.PersistenceServices
     public interface IUserRepository
     {
         Task<UserMaster> GetUserAsync(int id);
+        Task<UserMaster> GetUserByEmailAsync(string email);
         Task<IReadOnlyList<UserMaster>> GetAllUsers();
         Task<UserMaster> AuthenticateUser(string userName, string password);
         Task<int> AddNewUserAsync(UserMaster user);
