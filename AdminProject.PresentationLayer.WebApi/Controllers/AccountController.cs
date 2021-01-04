@@ -13,36 +13,35 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
     [Route("api")]
     public class AccountController : ControllerBase
     {
-        private readonly ITokenClaimsService _tokenClaimsService;
-        private readonly IUserService _userBusinessInstance;
         private readonly IConfiguration _config;
         private readonly IEmailService _emailService;
+        private readonly ISecurityService _securityBusinessInstance;
+        private readonly ITokenClaimsService _tokenClaimsService;
+        private readonly IUserService _userBusinessInstance;
 
         public AccountController(IUserService userBusinessInstance,
             ITokenClaimsService tokenClaimsService,
             IConfiguration config,
-            IEmailService emailService)
+            IEmailService emailService, 
+            ISecurityService securityBusinessInstance)
         {
             _tokenClaimsService = tokenClaimsService;
             _userBusinessInstance = userBusinessInstance;
             _config = config;
             _emailService = emailService;
+            _securityBusinessInstance = securityBusinessInstance;
         }
 
         [HttpPost("token")]
         [AllowAnonymous]
-        public async Task<ActionResult<AuthenticateResponse>> HandleAsync([FromBody] LoginRequest request)
+        public async Task<ActionResult<AuthenticateResponse>> Authenticate([FromBody] LoginRequest request)
         {
             var response = new AuthenticateResponse(request.CorrelationId());
             if (ModelState.IsValid)
-            {
                 try
                 {
                     var result = await _userBusinessInstance.AuthenticateUser(request.Username, request.Password);
-                    if (result == null)
-                    {
-                        return Unauthorized();
-                    }
+                    if (result == null) return Unauthorized();
                     response.IsSuccess = true;
                     response.ExpiresIn = int.Parse(_config.GetSection("Tokens").GetSection("Lifetime").Value);
 
@@ -53,8 +52,25 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
                 {
                     return BadRequest(ex);
                 }
-            }
+
             return BadRequest(ModelState);
+        }
+
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<ActionResult> RegisterUser([FromBody] UserMasterDto user)
+        {
+            if (user == null) return BadRequest();
+            try
+            {
+                var id = await _userBusinessInstance.AddNewUserAsync(user);
+                return Ok(id);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw new Exception(e.Message);
+            }
         }
 
         [HttpPost("forget-password")]
@@ -66,15 +82,16 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
             try
             {
                 var user = await _userBusinessInstance.GetUserByEmailAsync(model);
-
                 if (user == null) return response;
-                if (!SaveOtp(user.Id, out var uniqueString)) return response;
+
+                var uniqueString = await _securityBusinessInstance.GetOtpAsync(user.Id);
+                if (string.IsNullOrEmpty(uniqueString)) return response;
 
                 await _emailService.PrepareAndSendEmailAsync(user, uniqueString, AspectEnums.TemplateType.ResetPassword, null);
                 response.IsSuccess = true;
                 response.SingleResult = user;
                 response.StatusCode = 200;
-                response.Message = "You account has been reset. Please check your registered email for rest password link.";
+                response.Message = "Please check your registered email for rest password link.";
             }
             catch (Exception e)
             {
@@ -83,21 +100,85 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
                 response.IsSuccess = false;
                 response.Message = "Error occured: " + e.Message;
             }
+
             return response;
         }
 
-        private bool SaveOtp(int userId, out string uniqueString)
+        [HttpGet]
+        [Route("validate-reset-url/{id}")]
+        public async Task<JsonResponse<UserMasterDto>> ValidatePasswordResetUrl(string id)
         {
-            #region Prepare OTP Data
+            var response = new JsonResponse<UserMasterDto>();
+            try
+            {
+                var isValid = await _securityBusinessInstance.ValidateGuidAsync(id);
+                if (isValid)
+                {
+                    response.SingleResult = await _userBusinessInstance.GetUserByGuidAsync(id);
+                    response.IsSuccess = true;
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Password reset link is expired or invalid. Try again later.";
+                }
 
-            uniqueString = AppUtil.GetUniqueGuidString();
-            string otpString = AppUtil.GetUniqueRandomNumber(100000, 999999); // Generate a Six Digit OTP
-            _ = new OTPDto { Guid = uniqueString, Otp = otpString, CreatedDate = DateTime.Now, UserId = userId, Attempts = 0 };
+                response.StatusCode = 200;
+            }
+            catch (Exception ex)
+            {
+                response.SingleResult = null;
+                response.StatusCode = 500;
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
 
-            //return SecurityBusinessInstance.SaveOTP(objOTP);
-            #endregion
+            return response;
+        }
 
-            return true;
+        [HttpPost]
+        [Route("reset-password")]
+        public async Task<JsonResponse<bool>> ChangeUserPassword(LoginModel model)
+        {
+            var response = new JsonResponse<bool>();
+            try
+            {
+                var User = await _userBusinessInstance.GetUserByEmailAsync(model);
+                if (User == null)
+                {
+                    response.SingleResult = false;
+                    response.StatusCode = 200;
+                    response.IsSuccess = false;
+                    response.Message = "User does not exist in our system.";
+                    return response;
+                }
+
+                if (User.Password != model.Password)
+                {
+                    User.Password = model.Password;
+
+                    response.SingleResult = await _userBusinessInstance.ChangePasswordAsync(model.Guid, model.Password);
+                    response.IsSuccess = response.SingleResult;
+                    response.StatusCode = 200;
+                    response.Message = "Your password has been successfully updated.";
+                }
+                else
+                {
+                    response.SingleResult = false;
+                    response.StatusCode = 200;
+                    response.IsSuccess = false;
+                    response.Message = "You can not use same password. it must be different than previous.";
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
 
         [HttpGet]
@@ -114,7 +195,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         {
             if (userId == 0) return BadRequest();
 
-            UserMasterDto item = await _userBusinessInstance.GetUserAsync(userId);
+            var item = await _userBusinessInstance.GetUserAsync(userId);
             if (item is null) return NotFound();
 
             return Ok(item);

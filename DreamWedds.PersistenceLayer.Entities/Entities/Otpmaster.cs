@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
-    public class OtpMaster
+    public class OtpMaster : IAggregateRoot
     {
         public int Id { get; set; }
         public int UserId { get; set; }

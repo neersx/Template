@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using DreamWedds.CommonLayer.Application.AppSettings;
 using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.Aspects.Utitlities;
@@ -76,6 +77,11 @@ namespace DreamWedds.BusinessLayer.ServiceManager
                         item.SrcFieldValue ??= uniqueText;
                         body.Replace("{{UNIQUESTR}}", item.SrcFieldValue);
                         subject.Replace("{{UNIQUESTR}}", item.SrcFieldValue);
+                        break;
+                    case "URL":
+                        item.SrcFieldValue ??= uniqueText;
+                        body.Replace("{{URL}}", item.SrcFieldValue);
+                        subject.Replace("{{URL}}", item.SrcFieldValue);
                         break;
                     case "COMPANY":
                         item.SrcFieldValue ??= uniqueText;

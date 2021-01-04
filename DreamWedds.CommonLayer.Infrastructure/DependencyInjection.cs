@@ -20,10 +20,11 @@ namespace DreamWedds.CommonLayer.Infrastructure
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(Repository<>));
             services.AddTransient<IDateTime, DateTimeService>();
-            services.AddTransient<IUserService, UserServiceManager>();
             services.AddRepositoryDependency();
             services.AddTransient<ITokenClaimsService, IdentityTokenClaimService>();
-            services.AddTransient<IEmailService, EmailServiceManager>();
+            services.AddScoped<IUserService, UserServiceManager>();
+            services.AddScoped<ISecurityService, SecurityServiceManager>();
+            services.AddScoped<IEmailService, EmailServiceManager>();
            
             return services;
         }
