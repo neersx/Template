@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -11,7 +9,6 @@ using DreamWedds.CommonLayer.Aspects.Utitlities;
 using DreamWedds.PersistenceLayer.Entities.Entities;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using MailKit.Net.Smtp;
-using MailKit.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -54,6 +51,7 @@ namespace DreamWedds.BusinessLayer.ServiceManager
         private EmailsDto PrepareEmailBody(UserMasterDto user, string uniqueText, EmailTemplate template)
         {
             StringBuilder body = new StringBuilder(template.HtmlContent);
+            StringBuilder subject = new StringBuilder(template.Subject);
             var fields = template.EmailMergeFields;
             foreach (var item in fields)
             {
@@ -62,22 +60,27 @@ namespace DreamWedds.BusinessLayer.ServiceManager
                     case "FNAME":
                         item.SrcFieldValue ??= user.FirstName;
                         body.Replace("{{FNAME}}", item.SrcFieldValue);
+                        subject.Replace("{{FNAME}}", item.SrcFieldValue);
                         break;
                     case "LNAME":
                         item.SrcFieldValue ??= user.LastName;
-                        body.Replace("{{FNAME}}", item.SrcFieldValue);
+                        body.Replace("{{LNAME}}", item.SrcFieldValue);
+                        subject.Replace("{{LNAME}}", item.SrcFieldValue);
                         break;
                     case "EMAIL":
                         item.SrcFieldValue ??= user.Email;
                         body.Replace("{{EMAIL}}", item.SrcFieldValue);
+                        subject.Replace("{{EMAIL}}", item.SrcFieldValue);
                         break;
                     case "UNIQUESTR":
                         item.SrcFieldValue ??= uniqueText;
                         body.Replace("{{UNIQUESTR}}", item.SrcFieldValue);
+                        subject.Replace("{{UNIQUESTR}}", item.SrcFieldValue);
                         break;
                     case "COMPANY":
                         item.SrcFieldValue ??= uniqueText;
                         body.Replace("{{COMPANY}}", item.SrcFieldValue);
+                        subject.Replace("{{COMPANY}}", item.SrcFieldValue);
                         break;
                 }
             }
@@ -92,7 +95,7 @@ namespace DreamWedds.BusinessLayer.ServiceManager
                 Message = body.ToString(),
                 Body = body.ToString(),
                 AttachmentFileName = "Attachment",
-                Subject = template.Subject
+                Subject = subject.ToString()
             };
         }
 
