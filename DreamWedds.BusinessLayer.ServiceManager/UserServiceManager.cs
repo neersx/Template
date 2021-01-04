@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.PersistenceLayer.Entities.Entities;
@@ -14,16 +15,29 @@ namespace DreamWedds.BusinessLayer.ServiceManager
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-
-        public UserServiceManager(IUserRepository userPersistenceService, IMapper mapper)
+        private readonly IEmailService _emailService;
+        public UserServiceManager(IUserRepository userPersistenceService, IMapper mapper, IEmailService emailService)
         {
             _mapper = mapper;
+            _emailService = emailService;
             _userRepository = userPersistenceService;
         }
         public async Task<UserMasterDto> GetUserAsync(int id)
         {
             var user = await _userRepository.GetUserAsync(id);
             return _mapper.Map<UserMaster, UserMasterDto>(user);
+        }
+
+        public async Task<UserMasterDto> GetUserByGuidAsync(string guid)
+        {
+            var user = await _userRepository.GetUserByGuidAsync(guid);
+            return _mapper.Map<UserMaster, UserMasterDto>(user);
+        }
+
+        public async Task<bool> ChangePasswordAsync(string guid, string password)
+        {
+            password = EncryptionEngine.EncryptString(password);
+            return await _userRepository.ChangePasswordAsync(guid, password);
         }
 
         public async Task<UserMasterDto> GetUserByEmailAsync(LoginModel model)
@@ -57,8 +71,28 @@ namespace DreamWedds.BusinessLayer.ServiceManager
                 IsActive = true
             };
             await _userRepository.AssignRoleToUser(role);
+            if (userId > 0)
+            {
+                if (!SaveOtp(user.Id, out var uniqueString)) return 0;
+                await _emailService.PrepareAndSendEmailAsync(userDto, uniqueString, AspectEnums.TemplateType.Register, null);
+            }
             return userId;
         }
+
+        public bool SaveOtp(int userId, out string uniqueString)
+        {
+            #region Prepare OTP Data
+
+            uniqueString = AppUtil.GetUniqueGuidString();
+            string otpString = AppUtil.GetUniqueRandomNumber(100000, 999999); // Generate a Six Digit OTP
+            _ = new OTPDto { Guid = uniqueString, Otp = otpString, CreatedDate = DateTime.Now, UserId = userId, Attempts = 0 };
+
+            //return SecurityBusinessInstance.SaveOTP(objOTP);
+            #endregion
+
+            return true;
+        }
+
 
         public async Task UpdateUserAsync(UserMasterDto userDto)
         {

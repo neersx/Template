@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamWedds.CommonLayer.Application.DTO
+namespace DreamWedds.CommonLayer.Application.AppSettings
 {
     public class SmtpSettings
     {

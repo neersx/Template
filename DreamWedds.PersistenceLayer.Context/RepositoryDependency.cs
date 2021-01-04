@@ -13,6 +13,7 @@ namespace DreamWedds.PersistenceLayer.Repository
             services.AddTransient(typeof(IAsyncRepository<>), typeof(Repository<>));
             services.AddScoped<IUserRepository, UserDataImpl>();
             services.AddScoped<IEmailRepository, EmailDataImpl>();
+            services.AddScoped<ISecurityRepository, SecurityDataImpl>();
         }
     }
 }

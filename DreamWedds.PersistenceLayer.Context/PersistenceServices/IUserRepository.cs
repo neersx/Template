@@ -9,6 +9,8 @@ namespace DreamWedds.PersistenceLayer.Repository.PersistenceServices
     {
         Task<UserMaster> GetUserAsync(int id);
         Task<UserMaster> GetUserByEmailAsync(string email);
+        Task<UserMaster> GetUserByGuidAsync(string guid);
+        Task<bool> ChangePasswordAsync(string guid, string password); 
         Task<IReadOnlyList<UserMaster>> GetAllUsers();
         Task<UserMaster> AuthenticateUser(string userName, string password);
         Task<int> AddNewUserAsync(UserMaster user);

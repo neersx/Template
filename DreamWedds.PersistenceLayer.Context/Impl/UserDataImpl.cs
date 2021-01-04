@@ -1,8 +1,10 @@
-﻿using DreamWedds.PersistenceLayer.Entities.Entities;
+﻿using System;
+using DreamWedds.PersistenceLayer.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DreamWedds.CommonLayer.Aspects.Utitlities;
 using DreamWedds.PersistenceLayer.Entities.Specifications;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using DreamWedds.PersistenceLayer.Repository.Repository;
@@ -47,6 +49,32 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
         public async Task<UserMaster> GetUserAsync(int id)
         {
             return await _userRepository.GetByIdAsync(id);
+        }
+
+        public async Task<UserMaster> GetUserByGuidAsync(string guid)
+        {
+            var objOtp = await _dbContext.OtpMaster.AsNoTracking().FirstOrDefaultAsync(x => x.Guid == guid);
+            if (objOtp == null) return null;
+
+            return await _userRepository.GetByIdAsync(objOtp.UserId);
+        }
+
+        public async Task<bool> ChangePasswordAsync(string guid, string password)
+        {
+            int otpExirationHrs = Convert.ToInt32(AppUtil.GetAppSettings(AspectEnums.ConfigKeys.OTPExirationHrs));
+            var startTime = DateTime.Now.Subtract(new TimeSpan(otpExirationHrs, 0, 0));
+            var endTime = DateTime.Now;
+
+            var objOtp = await _dbContext.OtpMaster.FirstOrDefaultAsync(k => k.CreatedDate >= startTime && k.CreatedDate <= endTime && k.Guid == guid);
+            if (objOtp == null) return false;
+
+            var user = await _userRepository.GetByIdAsync(objOtp.UserId);
+            await _userRepository.UpdateAsync(user);
+            //Delete all previous OTPs
+            foreach (var o in await _dbContext.OtpMaster.Where(k => k.UserId == user.Id).ToListAsync())
+                _dbContext.OtpMaster.Remove(o);
+
+            return await _dbContext.SaveChangesAsync() > 0;
         }
 
         public async Task<UserMaster> GetUserByEmailAsync(string email)

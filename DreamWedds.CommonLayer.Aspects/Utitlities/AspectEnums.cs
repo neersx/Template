@@ -856,8 +856,8 @@ namespace DreamWedds.CommonLayer.Aspects.Utitlities
         {
             [Description("Validate only Employee Code")]
             EmplCode = 1,
-            [Description("Validate Employee Code and Email ID")]
-            EmplCode_Email = 2,
+            [Description("Validate Employee  Email ID")]
+            EmplEmail = 2,
             ForgotPasswordAttempts = 3,
             LastAttemptDuration = 4
         }
@@ -874,7 +874,12 @@ namespace DreamWedds.CommonLayer.Aspects.Utitlities
             Register = 1,
             ResetPassword = 2,
             AutoReply = 3,
-            Marketing = 4
+            Marketing = 4,
+            Sales = 5,
+            Festive = 6,
+            Invoice = 7,
+            Reminder = 8,
+            Acknowledgement = 9
         }
 
         public enum EmailTemplateCode
