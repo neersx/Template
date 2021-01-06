@@ -6,9 +6,9 @@ using AdminProject.PresentationLayer.WebApi.Model;
 using DreamWedds.BusinessLayer.Services;
 using DreamWedds.CommonLayer.Application;
 using DreamWedds.CommonLayer.Application.AppSettings;
-using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Aspects.Helpers;
 using DreamWedds.CommonLayer.Infrastructure;
+using DreamWedds.CommonLayer.Infrastructure.Correlation;
 using DreamWedds.PresentationLayer.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -46,6 +46,7 @@ namespace AdminProject.PresentationLayer.WebApi
             }));
 
             #endregion
+
             services.Configure<SmtpSettings>(Configuration.GetSection(nameof(SmtpSettings)));
             services.Configure<AccountSettings>(Configuration.GetSection(nameof(AccountSettings)));
             services.Configure<Encryption>(Configuration.GetSection(nameof(Encryption)));
@@ -53,7 +54,6 @@ namespace AdminProject.PresentationLayer.WebApi
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
-            // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
             services.AddAuthentication(x =>
@@ -87,8 +87,8 @@ namespace AdminProject.PresentationLayer.WebApi
             services.AddInfrastructure(Configuration);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddControllersWithViews(options =>
-                options.Filters.Add(new ApiExceptionFilter()));
+            //services.AddControllersWithViews(options =>
+            //    options.Filters.Add(new ApiExceptionFilter()));
             services.AddControllers();
         }
 
@@ -97,10 +97,12 @@ namespace AdminProject.PresentationLayer.WebApi
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseRouting();
+            app.UseCorrelationId();
             app.UseCors(x => x
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseMiddleware<JwtMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
