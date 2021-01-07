@@ -1,21 +1,27 @@
-﻿using DreamWedds.CommonLayer.Application.Interfaces;
-using DreamWedds.CommonLayer.Aspects.Constants;
-using DreamWedds.PersistenceLayer.Entities.Entities;
-using DreamWedds.PersistenceLayer.Entities.Specifications;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using DreamWedds.CommonLayer.Aspects.Constants;
+using DreamWedds.PersistenceLayer.Entities.Entities;
+using DreamWedds.PersistenceLayer.Entities.Specifications;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using DreamWedds.PersistenceLayer.Repository.Repository;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
-namespace DreamWedds.CommonLayer.Infrastructure.Impl
+namespace DreamWedds.CommonLayer.Infrastructure
 {
+
+    public interface ITokenClaimsService
+    {
+        Task<string> GetTokenAsync(int id);
+        Task<string> GetToken(int id);
+    }
+
     public class IdentityTokenClaimService : ITokenClaimsService
     {
         private readonly IUserRepository _userRepository;

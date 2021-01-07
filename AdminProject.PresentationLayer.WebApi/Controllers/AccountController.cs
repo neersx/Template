@@ -4,9 +4,11 @@ using AdminProject.PresentationLayer.WebApi.Model;
 using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.Aspects.Utitlities;
+using DreamWedds.CommonLayer.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AdminProject.PresentationLayer.WebApi.Controllers
 {
@@ -18,24 +20,28 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         private readonly ISecurityService _securityBusinessInstance;
         private readonly ITokenClaimsService _tokenClaimsService;
         private readonly IUserService _userBusinessInstance;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(IUserService userBusinessInstance,
             ITokenClaimsService tokenClaimsService,
             IConfiguration config,
             IEmailService emailService, 
-            ISecurityService securityBusinessInstance)
+            ISecurityService securityBusinessInstance, ILogger<AccountController> logger)
         {
             _tokenClaimsService = tokenClaimsService;
             _userBusinessInstance = userBusinessInstance;
             _config = config;
             _emailService = emailService;
             _securityBusinessInstance = securityBusinessInstance;
+            _logger = logger;
+            _logger.LogDebug(1, "Logger injected into AccountsController");
         }
 
         [HttpPost("token")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthenticateResponse>> Authenticate([FromBody] LoginRequest request)
         {
+            _logger.LogInformation("Authenticate user details.");
             var response = new AuthenticateResponse(request.CorrelationId());
             if (ModelState.IsValid)
                 try

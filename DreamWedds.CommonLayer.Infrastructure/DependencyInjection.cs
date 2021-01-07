@@ -2,7 +2,6 @@
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.ApplicationServices;
 using DreamWedds.CommonLayer.ApplicationServices.Impl;
-using DreamWedds.CommonLayer.Infrastructure.Impl;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
