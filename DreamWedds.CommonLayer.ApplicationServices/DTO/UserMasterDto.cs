@@ -5,12 +5,15 @@ using DreamWedds.CommonLayer.Application.Mappings;
 using DreamWedds.CommonLayer.Aspects.Security;
 using DreamWedds.PersistenceLayer.Entities.Common;
 using DreamWedds.PersistenceLayer.Entities.Entities;
+using Newtonsoft.Json;
 
 namespace DreamWedds.CommonLayer.Application.DTO
 {
 
     public class LoginModel : IMapFrom<LoginModel>
     {
+        [EmailAddress]
+        [Required]
         public string Email { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
@@ -46,6 +49,10 @@ namespace DreamWedds.CommonLayer.Application.DTO
         public string Mobile { get; set; }
         public int CompanyId { get; set; }
         public int RoleId { get; set; }
+
+        public string JwtToken { get; set; }
+        [JsonIgnore]
+        public string RefreshToken { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<UserMaster, UserMasterDto>()

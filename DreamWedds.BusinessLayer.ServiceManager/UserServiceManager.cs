@@ -40,11 +40,20 @@ namespace DreamWedds.BusinessLayer.ServiceManager
             return await _userRepository.ChangePasswordAsync(guid, password);
         }
 
-        public async Task<UserMasterDto> GetUserByEmailAsync(LoginModel model)
+        public async Task<UserMasterDto> GetUserByEmailAsync(string email)
         {
-            model = _mapper.Map<LoginModel, LoginModel>(model);
-            var user = await _userRepository.GetUserByEmailAsync(model.Email);
+            email = EncryptionEngine.EncryptString(email);
+            var user = await _userRepository.GetUserByEmailAsync(email);
             return _mapper.Map<UserMaster, UserMasterDto>(user);
+        }
+
+        public async Task<bool> IsUserAlreadyExists(string email)
+        {
+            var user = await GetUserByEmailAsync(email);
+            if (user != null)
+                await _emailService.SendAlreadyRegisteredEmail(user);
+
+            return user != null;
         }
 
         public async Task<UserMasterDto> AuthenticateUser(string userName, string password)
