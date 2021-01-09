@@ -28,7 +28,6 @@ namespace DreamWedds.CommonLayer.Infrastructure
             }
 
             _next = next ?? throw new ArgumentNullException(nameof(next));
-
             _options = options.Value;
         }
 

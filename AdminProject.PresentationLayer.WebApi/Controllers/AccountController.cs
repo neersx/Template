@@ -1,5 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using AdminProject.PresentationLayer.WebApi.Helpers;
 using AdminProject.PresentationLayer.WebApi.Model;
 using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
@@ -25,7 +25,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         public AccountController(IUserService userBusinessInstance,
             ITokenClaimsService tokenClaimsService,
             IConfiguration config,
-            IEmailService emailService, 
+            IEmailService emailService,
             ISecurityService securityBusinessInstance, ILogger<AccountController> logger)
         {
             _tokenClaimsService = tokenClaimsService;
@@ -43,23 +43,15 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         {
             _logger.LogInformation("Authenticate user details.");
             var response = new AuthenticateResponse(request.CorrelationId());
-            if (ModelState.IsValid)
-                try
-                {
-                    var result = await _userBusinessInstance.AuthenticateUser(request.Username, request.Password);
-                    if (result == null) return Unauthorized();
-                    response.IsSuccess = true;
-                    response.ExpiresIn = int.Parse(_config.GetSection("Tokens").GetSection("Lifetime").Value);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                    response.Token = await _tokenClaimsService.GetToken(result.Id);
-                    return response;
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex);
-                }
+            var result = await _userBusinessInstance.AuthenticateUser(request.Username, request.Password);
+            if (result == null) return Unauthorized();
+            response.IsSuccess = true;
+            response.ExpiresIn = int.Parse(_config.GetSection("Tokens").GetSection("Lifetime").Value);
 
-            return BadRequest(ModelState);
+            response.Token = await _tokenClaimsService.GetToken(result.Id);
+            return response;
         }
 
         [HttpPost("register")]
@@ -67,16 +59,12 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         public async Task<ActionResult> RegisterUser([FromBody] UserMasterDto user)
         {
             if (user == null) return BadRequest();
-            try
-            {
-                var id = await _userBusinessInstance.AddNewUserAsync(user);
-                return Ok(id);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw new Exception(e.Message);
-            }
+            var userExists = await _userBusinessInstance.IsUserAlreadyExists(user.Email);
+            if (userExists) throw new AppException("User with email address: " + user.Email + " already registered with us. Please follow the email we sent now.");
+
+            var id = await _userBusinessInstance.AddNewUserAsync(user);
+            return Ok(new { SingleResult = id, IsSuccess = true });
+
         }
 
         [HttpPost("forget-password")]
@@ -85,277 +73,53 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
             var response = new JsonResponse<UserMasterDto>();
             if (string.IsNullOrEmpty(model.Email))
                 return BadRequest();
-            try
-            {
-                var user = await _userBusinessInstance.GetUserByEmailAsync(model);
-                if (user == null) return response;
 
-                var uniqueString = await _securityBusinessInstance.GetOtpAsync(user.Id);
-                if (string.IsNullOrEmpty(uniqueString)) return response;
+            var user = await _userBusinessInstance.GetUserByEmailAsync(model.Email);
+            if (user == null) throw new AppException("Email address incorrect. No user found.");
 
-                await _emailService.PrepareAndSendEmailAsync(user, uniqueString, AspectEnums.TemplateType.ResetPassword, null);
-                response.IsSuccess = true;
-                response.SingleResult = user;
-                response.StatusCode = 200;
-                response.Message = "Please check your registered email for rest password link.";
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                response.StatusCode = 500;
-                response.IsSuccess = false;
-                response.Message = "Error occured: " + e.Message;
-            }
+            var uniqueString = await _securityBusinessInstance.GetOtpAsync(user.Id);
+            if (string.IsNullOrEmpty(uniqueString)) throw new AppException("User not found.");
 
-            return response;
+
+            await _emailService.PrepareAndSendEmailAsync(user, uniqueString, AspectEnums.TemplateType.ResetPassword, null);
+            response.IsSuccess = true;
+            response.SingleResult = user;
+            response.Message = "Please check your registered email for reset password link.";
+
+            return Ok(response);
         }
 
         [HttpGet]
         [Route("validate-reset-url/{id}")]
-        public async Task<JsonResponse<UserMasterDto>> ValidatePasswordResetUrl(string id)
+        public async Task<ActionResult<JsonResponse<UserMasterDto>>> ValidatePasswordResetUrl(string id)
         {
             var response = new JsonResponse<UserMasterDto>();
-            try
-            {
-                var isValid = await _securityBusinessInstance.ValidateGuidAsync(id);
-                if (isValid)
-                {
-                    response.SingleResult = await _userBusinessInstance.GetUserByGuidAsync(id);
-                    response.IsSuccess = true;
-                }
-                else
-                {
-                    response.IsSuccess = false;
-                    response.Message = "Password reset link is expired or invalid. Try again later.";
-                }
 
-                response.StatusCode = 200;
-            }
-            catch (Exception ex)
-            {
-                response.SingleResult = null;
-                response.StatusCode = 500;
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-            }
+            var isValid = await _securityBusinessInstance.ValidateGuidAsync(id);
+            if (!isValid)
+                throw new AppException("Password reset link is expired or invalid. Try again later.");
+            response.SingleResult = await _userBusinessInstance.GetUserByGuidAsync(id);
+            response.IsSuccess = true;
 
-            return response;
+            return Ok(response);
         }
 
         [HttpPost]
         [Route("reset-password")]
-        public async Task<JsonResponse<bool>> ChangeUserPassword(LoginModel model)
+        public async Task<JsonResponse<bool>> ResetPassword(ResetPasswordRequest model)
         {
             var response = new JsonResponse<bool>();
-            try
-            {
-                var User = await _userBusinessInstance.GetUserByEmailAsync(model);
-                if (User == null)
-                {
-                    response.SingleResult = false;
-                    response.StatusCode = 200;
-                    response.IsSuccess = false;
-                    response.Message = "User does not exist in our system.";
-                    return response;
-                }
+            var user = await _userBusinessInstance.GetUserByGuidAsync(model.Token);
+            if (user == null)
+                throw new AppException("Invalid user token.");
 
-                if (User.Password != model.Password)
-                {
-                    User.Password = model.Password;
-
-                    response.SingleResult = await _userBusinessInstance.ChangePasswordAsync(model.Guid, model.Password);
-                    response.IsSuccess = response.SingleResult;
-                    response.StatusCode = 200;
-                    response.Message = "Your password has been successfully updated.";
-                }
-                else
-                {
-                    response.SingleResult = false;
-                    response.StatusCode = 200;
-                    response.IsSuccess = false;
-                    response.Message = "You can not use same password. it must be different than previous.";
-                    return response;
-                }
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.StatusCode = 500;
-                response.Message = ex.Message;
-            }
+            response.SingleResult = await _userBusinessInstance.ChangePasswordAsync(model.Token, model.Password);
+            response.IsSuccess = response.SingleResult;
+            response.StatusCode = 200;
+            response.Message = "Your password has been successfully updated.";
 
             return response;
         }
 
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<UserMasterDto>> Get(int id)
-        {
-            if (id == 0) return BadRequest();
-            return await _userBusinessInstance.GetUserAsync(id);
-        }
-
-        [HttpGet("user/{UserId}")]
-        [Authorize]
-        public async Task<ActionResult> GetUserById(int userId)
-        {
-            if (userId == 0) return BadRequest();
-
-            var item = await _userBusinessInstance.GetUserAsync(userId);
-            if (item is null) return NotFound();
-
-            return Ok(item);
-        }
-
-        [HttpPost("user/add")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> AddNewUser([FromBody] UserMasterDto user)
-        {
-            if (user == null) return BadRequest();
-            try
-            {
-                var id = await _userBusinessInstance.AddNewUserAsync(user);
-                return Ok(id);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        [HttpPut("user/update")]
-        [Authorize]
-        public async Task<ActionResult> UpdateExistingUser([FromBody] UserMasterDto user)
-        {
-            if (user == null) return BadRequest();
-            try
-            {
-                await _userBusinessInstance.UpdateUserAsync(user);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        [HttpGet("user/remove/{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> RemoveExistingUser(int id)
-        {
-            if (id == 0) return BadRequest();
-            try
-            {
-                await _userBusinessInstance.RemoveUserAsync(id);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        [HttpPost("user/assign-role")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> AssignRoleToUser([FromBody] UserRolesDto roles)
-        {
-            if (roles == null) return BadRequest();
-            try
-            {
-                var id = await _userBusinessInstance.AssignRoleToUser(roles);
-                return Ok(id);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        [HttpGet("user/remove-role/{userId}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> RemoveRoleFromUser(int userId)
-        {
-            if (userId == 0) return BadRequest();
-            try
-            {
-                await _userBusinessInstance.RevokeRoleFromUser(userId);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        [HttpGet("roles")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> GetRoles()
-        {
-            var item = await _userBusinessInstance.GetAllRolesAsync();
-            if (item is null) return NotFound();
-
-            return Ok(item);
-        }
-
-        [HttpGet("user-roles/{userId}")]
-        [Authorize]
-        public async Task<ActionResult> GetUserRoles(int userId)
-        {
-            var item = await _userBusinessInstance.GetUserRolesAsync(userId);
-            if (item is null) return NotFound();
-
-            return Ok(item);
-        }
-
-        [HttpGet("role/{id}")]
-        [Authorize]
-        public async Task<ActionResult> GetRoleById(int id)
-        {
-            if (id == 0) return BadRequest();
-
-            var item = await _userBusinessInstance.GetRoleByIdAsync(id);
-            if (item is null) return NotFound();
-
-            return Ok(item);
-        }
-
-        [HttpPost("role/add")]
-        [Authorize]
-        public async Task<ActionResult> AddNewRole([FromBody] RoleMasterDto role)
-        {
-            if (role == null) return BadRequest();
-            try
-            {
-                var id = await _userBusinessInstance.AddNewRoleAsync(role);
-                return Ok(id);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        [HttpPut("role/update")]
-        [Authorize]
-        public async Task<ActionResult> UpdateExistingRole([FromBody] RoleMasterDto role)
-        {
-            if (role == null) return BadRequest();
-            try
-            {
-                await _userBusinessInstance.UpdateRoleAsync(role);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
     }
 }

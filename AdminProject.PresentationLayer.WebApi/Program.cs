@@ -1,20 +1,19 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using AdminProject.PresentationLayer.WebApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
 
-namespace DreamWedds.PresentationLayer.WebApi
+namespace AdminProject.PresentationLayer.WebApi
 {
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+            var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
             try
             {
                 logger.Debug("Initializing main");

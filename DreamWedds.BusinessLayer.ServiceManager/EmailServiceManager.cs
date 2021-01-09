@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,14 +24,25 @@ namespace DreamWedds.BusinessLayer.ServiceManager
         private readonly IEmailRepository _emailRepository;
         private readonly IMapper _mapper;
         private readonly SmtpSettings _smtpSettings;
+        private readonly AppSettings _appSettings;
         private readonly IWebHostEnvironment _env;
 
-        public EmailServiceManager(IEmailRepository emailRepository, IMapper mapper, IOptions<SmtpSettings> smtpSettings, IWebHostEnvironment env)
+        private readonly string _company;
+        private readonly string _baseUrl;
+
+        public EmailServiceManager(IEmailRepository emailRepository,
+            IMapper mapper,
+            IOptions<SmtpSettings> smtpSettings,
+            IWebHostEnvironment env,
+            IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
             _emailRepository = emailRepository;
             _smtpSettings = smtpSettings.Value;
             _env = env;
+            _appSettings = appSettings.Value;
+            _company = _appSettings.Company;
+            _baseUrl = _appSettings.HostUrl;
         }
         public Task<int> SubmitContactUs(ContactUsDTO model)
         {
@@ -88,6 +101,11 @@ namespace DreamWedds.BusinessLayer.ServiceManager
                         body.Replace("{{COMPANY}}", item.SrcFieldValue);
                         subject.Replace("{{COMPANY}}", item.SrcFieldValue);
                         break;
+                    default:
+                        body.Replace("{{FNAME}}", user.FirstName);
+                        body.Replace("{{COMPANY}}", _company);
+                        body.Replace("{{EMAIL}}", user.Email);
+                        break;
                 }
             }
 
@@ -97,12 +115,25 @@ namespace DreamWedds.BusinessLayer.ServiceManager
                 FromName = _smtpSettings.SenderName,
                 ToEmail = user.Email,
                 ToName = user.FirstName,
-                Mobile = user.Mobile,
+                Mobile = user?.Mobile,
                 Message = body.ToString(),
                 Body = body.ToString(),
                 AttachmentFileName = "Attachment",
                 Subject = subject.ToString()
             };
+        }
+
+        public async Task SendAlreadyRegisteredEmail(UserMasterDto user)
+        {
+            var template = new EmailTemplate();
+
+            string message = $@"<p>If you don't know your password please visit the <a href=""{_baseUrl}/account/forgot-password"">forgot password</a> page.</p>";
+            template.Subject = "Sign-up Verification API - Email Already Registered";
+            template.HtmlContent = $@"<h4>Email Already Registered</h4>
+                         <p>Your email <strong>{{EMAIL}}</strong> is already registered.</p>
+                         {message}";
+            var email = PrepareEmailBody(user, String.Empty, template);
+            await SendEmailAsync(email);
         }
 
         public async Task SendEmailAsync(EmailsDto mailRequest)

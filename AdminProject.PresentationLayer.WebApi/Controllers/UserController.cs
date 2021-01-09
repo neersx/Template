@@ -1,5 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using AdminProject.PresentationLayer.WebApi.Helpers;
+using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.Aspects.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -8,14 +9,10 @@ using AuthorizeAttribute = Microsoft.AspNetCore.Authorization.AuthorizeAttribute
 
 namespace AdminProject.PresentationLayer.WebApi.Controllers
 {
-    [ApiController]   
-    [Route("[controller]")]
+    [ApiController]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
 
         private readonly IUserService _userBusinessInstance;
         private readonly ILogger<UserController> _logger;
@@ -26,49 +23,63 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public IActionResult Get()
-        {
-            _logger.Log(LogLevel.Debug, "Hello Debugger!");
-            try
-            {
-                var user = Summaries;
-                if (user != null)
-                {
-                    return Ok(user);
-                }
-
-                return NotFound("No User found");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-
-        }
 
         [HttpGet]
         [Authorize]
-        [Route("users")]
-        public async Task<IActionResult> GetAllusers()
+        [Route("all-users")]
+        public async Task<IActionResult> GetAllUsers()
         {
-            _logger.Log(LogLevel.Debug, "Hello Debugger!");
             var userId = User.GetLoggedInUserId<string>();
-            try
-            {
-                var user = await _userBusinessInstance.GetAllUsers();
-                if (user != null)
-                {
-                    return Ok(user);
-                }
+            var user = await _userBusinessInstance.GetAllUsers();
+            if (user == null) throw new AppException("No User found for: " + userId);
 
-                return NotFound("No User found for: " + userId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
+            return Ok(user);
 
+        }
+
+        [HttpGet("{UserId}")]
+        [Authorize]
+        public async Task<ActionResult> GetUserById(int userId)
+        {
+            if (userId == 0) return BadRequest();
+
+            var item = await _userBusinessInstance.GetUserAsync(userId);
+            if (item is null) return NotFound();
+
+            return Ok(item);
+        }
+
+        [HttpPost("add")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> AddNewUser([FromBody] UserMasterDto user)
+        {
+            if (user == null) return BadRequest();
+            var userExists = await _userBusinessInstance.IsUserAlreadyExists(user.Email);
+            if (userExists) throw new AppException("User with email address: " + user.Email + " already registered with us. Please follow the email we sent now.");
+
+            var id = await _userBusinessInstance.AddNewUserAsync(user);
+            return Ok(id);
+        }
+
+        [HttpPut("update")]
+        [Authorize]
+        public async Task<ActionResult> UpdateExistingUser([FromBody] UserMasterDto user)
+        {
+            if (user == null) return BadRequest();
+
+            await _userBusinessInstance.UpdateUserAsync(user);
+            return Ok();
+
+        }
+
+        [HttpGet("remove/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> RemoveExistingUser(int id)
+        {
+            if (id == 0) return BadRequest();
+
+            await _userBusinessInstance.RemoveUserAsync(id);
+            return Ok();
         }
     }
 }

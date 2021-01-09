@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace AdminProject.PresentationLayer.WebApi.Helpers
 {
 
-    public class CustomAppException : Exception
+    public class AppException : Exception
     {
-        public CustomAppException() : base() {}
+        public AppException() : base() {}
 
-        public CustomAppException(string message) : base(message) { }
+        public AppException(string message) : base(message) { }
 
-        public CustomAppException(string message, params object[] args) 
+        public AppException(string message, params object[] args) 
             : base(String.Format(CultureInfo.CurrentCulture, message, args))
         {
         }

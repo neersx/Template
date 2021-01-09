@@ -9,6 +9,7 @@ namespace DreamWedds.CommonLayer.Application.Interfaces
     {
         Task<int> SubmitContactUs(ContactUsDTO model);
         Task SendEmailAsync(EmailsDto mailRequest);
+        Task SendAlreadyRegisteredEmail(UserMasterDto user);
         Task PrepareAndSendEmailAsync(UserMasterDto user, string otherText, AspectEnums.TemplateType type, AspectEnums.EmailTemplateCode? code);
         Task<EmailTemplateDto> GetEmailTemplateAsync(AspectEnums.TemplateType type, AspectEnums.EmailTemplateCode? code);
     }

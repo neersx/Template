@@ -3,10 +3,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AdminProject.PresentationLayer.WebApi.Model;
+using DreamWedds.CommonLayer.Application.AppSettings;
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.Aspects.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,12 +18,12 @@ namespace AdminProject.PresentationLayer.WebApi.Helpers
     public class JwtMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IConfiguration _config;
+        private readonly AppSettings _appsettings;
 
-        public JwtMiddleware(RequestDelegate next, IConfiguration config)
+        public JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appsettings)
         {
             _next = next;
-            _config = config;
+            _appsettings = appsettings.Value;
         }
 
         public async Task Invoke(HttpContext context, IUserService userService)
@@ -39,7 +42,7 @@ namespace AdminProject.PresentationLayer.WebApi.Helpers
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 IdentityModelEventSource.ShowPII = true;
-                var key = Encoding.ASCII.GetBytes(AuthorizationConstants.JWT_SECRET_KEY);
+                var key = Encoding.ASCII.GetBytes(_appsettings.Secret);
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
