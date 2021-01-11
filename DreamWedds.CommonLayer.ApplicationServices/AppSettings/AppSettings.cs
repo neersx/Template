@@ -5,5 +5,6 @@
         public string Secret { get; set; }
         public string Company { get; set; }
         public string HostUrl { get; set; }
+        public string SessionTimeout { get; set; }
     }
 }

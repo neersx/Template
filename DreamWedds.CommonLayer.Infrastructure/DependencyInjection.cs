@@ -2,6 +2,7 @@
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.ApplicationServices;
 using DreamWedds.CommonLayer.ApplicationServices.Impl;
+using DreamWedds.CommonLayer.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,9 @@ namespace DreamWedds.CommonLayer.Infrastructure
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddRepositoryDependency();
             services.AddTransient<ITokenClaimsService, IdentityTokenClaimService>();
+            services.AddScoped<ITaskAuthorisation, TaskAuthorisation>();
+            services.AddScoped<ITaskSecurityProvider, TaskSecurityProvider>();
+
             services.AddScoped<IUserService, UserServiceManager>();
             services.AddScoped<ISecurityService, SecurityServiceManager>();
             services.AddScoped<IEmailService, EmailServiceManager>();
