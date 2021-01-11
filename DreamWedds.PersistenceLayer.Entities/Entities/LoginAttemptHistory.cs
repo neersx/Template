@@ -10,8 +10,6 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
         public int UserId { get; set; }
         public DateTime? LoginDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
-        public string Lattitude { get; set; }
-        public string Longitude { get; set; }
         public string IpAddress { get; set; }
         public string Browser { get; set; }
 

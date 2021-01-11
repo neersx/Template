@@ -20,11 +20,15 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
             logger.LogDebug(1, "Logger injected into RolesController");
         }
 
-        [HttpGet]
-        public async Task<ActionResult<UserMasterDto>> Get(int id)
+        [HttpGet("get/{id}")]
+        public async Task<ActionResult> GetRoleById(int id)
         {
             if (id == 0) return BadRequest();
-            return await _userBusinessInstance.GetUserAsync(id);
+
+            var item = await _userBusinessInstance.GetRoleByIdAsync(id);
+            if (item is null) return NotFound();
+
+            return Ok(item);
         }
 
         [HttpPost("user/assign-role")]
@@ -55,7 +59,6 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpGet("user-roles/{userId}")]
-        [Authorize]
         public async Task<ActionResult> GetUserRoles(int userId)
         {
             var item = await _userBusinessInstance.GetUserRolesAsync(userId);
@@ -64,20 +67,7 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
             return Ok(item);
         }
 
-        [HttpGet("{id}")]
-        [Authorize]
-        public async Task<ActionResult> GetRoleById(int id)
-        {
-            if (id == 0) return BadRequest();
-
-            var item = await _userBusinessInstance.GetRoleByIdAsync(id);
-            if (item is null) return NotFound();
-
-            return Ok(item);
-        }
-
         [HttpPost("add")]
-        [Authorize]
         public async Task<ActionResult> AddNewRole([FromBody] RoleMasterDto role)
         {
             if (role == null) return BadRequest();
@@ -87,7 +77,6 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpPut("update")]
-        [Authorize]
         public async Task<ActionResult> UpdateExistingRole([FromBody] RoleMasterDto role)
         {
             if (role == null) return BadRequest();

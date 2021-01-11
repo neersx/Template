@@ -4,7 +4,6 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AdminProject.PresentationLayer.WebApi.Helpers;
-using DreamWedds.CommonLayer.Aspects.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
