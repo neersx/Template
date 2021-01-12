@@ -21,6 +21,20 @@
     <Compile Remove="Migrations\20200915180129_IdentityMigration.Designer.cs" />
     <Compile Remove="Migrations\20200919200414_Identity.cs" />
     <Compile Remove="Migrations\20200919200414_Identity.Designer.cs" />
+    <Compile Remove="Migrations\20210112031031_SecurityMigr.cs" />
+    <Compile Remove="Migrations\20210112031031_SecurityMigr.Designer.cs" />
+    <Compile Remove="Migrations\20210112094626_Security.cs" />
+    <Compile Remove="Migrations\20210112094626_Security.Designer.cs" />
+    <Compile Remove="Migrations\20210112094929_SecurityMigration.cs" />
+    <Compile Remove="Migrations\20210112094929_SecurityMigration.Designer.cs" />
+    <Compile Remove="Migrations\20210112095521_SecurityMigration.cs" />
+    <Compile Remove="Migrations\20210112095521_SecurityMigration.Designer.cs" />
+    <Compile Remove="Migrations\20210112105255_SecurityMigration.cs" />
+    <Compile Remove="Migrations\20210112105255_SecurityMigration.Designer.cs" />
+    <Compile Remove="Migrations\20210112105431_SecurityMigration.cs" />
+    <Compile Remove="Migrations\20210112105431_SecurityMigration.Designer.cs" />
+    <Compile Remove="Migrations\20210112110509_SecurityMigration.cs" />
+    <Compile Remove="Migrations\20210112110509_SecurityMigration.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
