@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using AutoMapper;
 using DreamWedds.PersistenceLayer.Entities.Common;
 
@@ -29,6 +30,8 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
         public string SrcFieldValue { get; set; }
         public int? Sequence { get; set; }
         public int? TemplateCode { get; set; }
+
+        [ForeignKey("EmailTemplateId")]
         public virtual EmailTemplate EmailTemplate { get; set; }
     }
 }

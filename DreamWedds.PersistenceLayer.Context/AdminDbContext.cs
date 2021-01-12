@@ -36,6 +36,16 @@ namespace DreamWedds.PersistenceLayer.Repository
         public DbSet<CommonSetup> CommonSetup { get; set; }
         public DbSet<EmailTemplate> EmailTemplate { get; set; }
         public DbSet<EmailMergeFields> EmailMergeFields { get; set; }
+        public DbSet<SecurityTask> SecurityTask { get; set; }
+        public DbSet<UserSettings> UserSettings { get; set; }
+        public DbSet<SettingDefinition> SettingDefinition { get; set; }
+        public DbSet<RowAccess> RowAccess { get; set; }
+        public DbSet<Currency> Currency { get; set; }
+        public DbSet<Country> Country { get; set; }
+        public DbSet<CountryGroup> CountryGroup { get; set; }
+        public DbSet<State> State { get; set; }
+        public DbSet<TableCode> TableCode { get; set; }
+        public DbSet<TaxRate> TaxRate { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
@@ -57,6 +67,13 @@ namespace DreamWedds.PersistenceLayer.Repository
 
             return base.SaveChangesAsync(cancellationToken);
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CountryGroup>()
+                .HasKey(o => new { o.Id, o.MemberCountry });
+        }
+
 
     }
 }

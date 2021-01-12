@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
