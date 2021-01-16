@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace DreamWedds.PersistenceLayer.Entities.Entities
 {
-    public partial class LoginAttemptHistory
+    public class LoginAttemptHistory
     {
         public long Id { get; set; }
         public int? FailedAttempt { get; set; }
@@ -12,7 +11,6 @@ namespace DreamWedds.PersistenceLayer.Entities.Entities
         public DateTime? LastLoginDate { get; set; }
         public string IpAddress { get; set; }
         public string Browser { get; set; }
-
         public virtual UserMaster User { get; set; }
     }
 }

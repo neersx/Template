@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using DreamWedds.CommonLayer.Application.Model.Security;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace DreamWedds.CommonLayer.Infrastructure.Security
 {

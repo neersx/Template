@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using DreamWedds.CommonLayer.Application.Model.Security;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
