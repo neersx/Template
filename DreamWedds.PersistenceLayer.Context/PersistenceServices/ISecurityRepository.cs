@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using DreamWedds.CommonLayer.Application.Model.Security;
 using DreamWedds.PersistenceLayer.Entities.Entities;
 
 namespace DreamWedds.PersistenceLayer.Repository.PersistenceServices
@@ -7,5 +9,7 @@ namespace DreamWedds.PersistenceLayer.Repository.PersistenceServices
     {
         Task<bool> SaveOtpAsync(OtpMaster otp);
         Task<bool> ValidateGuidAsync(string guid);
+
+        IEnumerable<ValidSecurityTask> ListAvailableTasks(int? userId = null);
     }
 }

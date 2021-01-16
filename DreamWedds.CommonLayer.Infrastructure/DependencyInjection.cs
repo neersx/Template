@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DreamWedds.PersistenceLayer.Repository;
 using DreamWedds.PersistenceLayer.Repository.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DreamWedds.CommonLayer.Infrastructure
 {
@@ -24,6 +25,7 @@ namespace DreamWedds.CommonLayer.Infrastructure
             services.AddTransient<ITokenClaimsService, IdentityTokenClaimService>();
             services.AddScoped<ITaskAuthorisation, TaskAuthorisation>();
             services.AddScoped<ITaskSecurityProvider, TaskSecurityProvider>();
+            services.AddScoped<IAuthorizationHandler, TaskAuthorizationHandler>();
 
             services.AddScoped<IUserService, UserServiceManager>();
             services.AddScoped<ISecurityService, SecurityServiceManager>();

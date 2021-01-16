@@ -1,14 +1,28 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using DreamWedds.CommonLayer.Application.Model.Security;
+using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 
 namespace DreamWedds.CommonLayer.Infrastructure.Security
 {
     public class TaskSecurityProvider : ITaskSecurityProvider
     {
+        private readonly ISecurityRepository _securityRepository;
+        private readonly IMapper _mapper;
+
+        public TaskSecurityProvider(ISecurityRepository securityRepository, IMapper mapper)
+        {
+            _securityRepository = securityRepository;
+            _mapper = mapper;
+        }
+
         public IEnumerable<ValidSecurityTask> ListAvailableTasks(int? userId = null)
         {
-            throw new NotImplementedException();
+            return _securityRepository.ListAvailableTasks(userId);
         }
 
         public bool HasAccessTo(ApplicationTask applicationTask)
@@ -26,4 +40,5 @@ namespace DreamWedds.CommonLayer.Infrastructure.Security
             throw new NotImplementedException();
         }
     }
+
 }

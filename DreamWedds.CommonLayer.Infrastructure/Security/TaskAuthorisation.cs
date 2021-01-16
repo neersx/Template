@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using DreamWedds.CommonLayer.Application.Model.Security;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace DreamWedds.CommonLayer.Infrastructure.Security
 {
@@ -13,21 +16,20 @@ namespace DreamWedds.CommonLayer.Infrastructure.Security
             _taskSecurityProvider = taskSecurityProvider;
         }
 
-         public bool Authorize(
-            IEnumerable<RequiresAccessToAttribute> actionAttributes)
+        public bool Authorize(IEnumerable<RequiresAccessToAttribute> actionAttributes)
         {
-            if(actionAttributes == null) throw new ArgumentNullException(nameof(actionAttributes));
+            if (actionAttributes == null) throw new ArgumentNullException(nameof(actionAttributes));
             //if(controllerAttributes == null) throw new ArgumentNullException(nameof(controllerAttributes));
 
             var actionAttributesArray = actionAttributes.ToArray();
             //var controllerAttributesArray = controllerAttributes.ToArray();
 
-            if(!actionAttributesArray.Any())
+            if (!actionAttributesArray.Any())
                 return true;
 
             var allowedTasks = _taskSecurityProvider.ListAvailableTasks();
 
-            if(actionAttributesArray.Any(a => allowedTasks.Any(t => t.TaskId == (int)a.Task && HasAccess(t, a))))
+            if (actionAttributesArray.Any(a => allowedTasks.Any(t => t.TaskId == (int)a.Task && HasAccess(t, a))))
                 return true;
 
             return false;
@@ -48,6 +50,6 @@ namespace DreamWedds.CommonLayer.Infrastructure.Security
 
             return hasAccess;
         }
-    
+
     }
 }

@@ -2,13 +2,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AdminProject.PresentationLayer.WebApi.CustomFilters;
 using AdminProject.PresentationLayer.WebApi.Helpers;
-using AdminProject.PresentationLayer.WebApi.Model;
 using DreamWedds.BusinessLayer.Services;
 using DreamWedds.CommonLayer.Application;
 using DreamWedds.CommonLayer.Application.AppSettings;
 using DreamWedds.CommonLayer.Aspects.Helpers;
 using DreamWedds.CommonLayer.Infrastructure;
 using DreamWedds.CommonLayer.Infrastructure.Correlation;
+using DreamWedds.CommonLayer.Infrastructure.Security;
 using DreamWedds.PresentationLayer.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -53,9 +53,18 @@ namespace AdminProject.PresentationLayer.WebApi
             services.AddSingleton(resolver => resolver.GetRequiredService<IOptionsMonitor<Encryption>>().CurrentValue);
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
-
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("TaskSecurity", policy =>
+                    policy.RequireAuthenticatedUser()
+                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .AddRequirements(new TaskPermissionsRequirement()));
+            });
+
+
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -86,9 +95,9 @@ namespace AdminProject.PresentationLayer.WebApi
             services.AddApplication();
             services.AddInfrastructure(Configuration);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
+            services.AddScoped<ITaskAuthorisation, TaskAuthorisation>();
             //services.AddControllersWithViews(options =>
-            //    options.Filters.Add(new ApiExceptionFilter()));
+            //    options.Filters.Add(new AuthorizationAttribute()));
             services.AddControllers();
         }
 

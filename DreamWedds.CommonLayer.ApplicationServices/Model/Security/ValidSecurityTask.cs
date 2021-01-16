@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamWedds.CommonLayer.Infrastructure.Security
+namespace DreamWedds.CommonLayer.Application.Model.Security
 {
     public class ValidSecurityTask
     {

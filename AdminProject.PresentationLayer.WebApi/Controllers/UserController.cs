@@ -3,6 +3,7 @@ using AdminProject.PresentationLayer.WebApi.Helpers;
 using DreamWedds.CommonLayer.Application.DTO;
 using DreamWedds.CommonLayer.Application.Interfaces;
 using DreamWedds.CommonLayer.Aspects.Extensions;
+using DreamWedds.CommonLayer.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using AuthorizeAttribute = Microsoft.AspNetCore.Authorization.AuthorizeAttribute;
@@ -10,6 +11,7 @@ using AuthorizeAttribute = Microsoft.AspNetCore.Authorization.AuthorizeAttribute
 namespace AdminProject.PresentationLayer.WebApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/user")]
     public class UserController : ControllerBase
     {
@@ -25,7 +27,8 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
 
 
         [HttpGet]
-        [Authorize]
+        [RequiresAccessTo(ApplicationTask.AllowedAccessAlways)]
+        [Authorize(Policy = "TaskSecurity")]
         [Route("all-users")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -38,7 +41,6 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpGet("{UserId}")]
-        [Authorize]
         public async Task<ActionResult> GetUserById(int userId)
         {
             if (userId == 0) return BadRequest();
@@ -62,7 +64,6 @@ namespace AdminProject.PresentationLayer.WebApi.Controllers
         }
 
         [HttpPut("update")]
-        [Authorize]
         public async Task<ActionResult> UpdateExistingUser([FromBody] UserMasterDto user)
         {
             if (user == null) return BadRequest();

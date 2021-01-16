@@ -10,7 +10,7 @@ namespace DreamWedds.CommonLayer.Infrastructure.Security
         /// <summary>Required for business entities that are yet to define task security</summary>
         NotDefined = -1,
         /// <summary>Allows to create, update or delete event note types in the system.</summary>
-        MaintainEventNoteTypes = 228,
+        MaintainUser = 11,
         MaintainCaseAttachments = 231,
         ScheduleEpoDataDownload = 232,
         MaintainLocality = 234,

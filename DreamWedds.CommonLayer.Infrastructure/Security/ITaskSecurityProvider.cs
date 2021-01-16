@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using DreamWedds.CommonLayer.Application.Model.Security;
 
 namespace DreamWedds.CommonLayer.Infrastructure.Security
 {
@@ -15,8 +17,9 @@ namespace DreamWedds.CommonLayer.Infrastructure.Security
         bool UserHasAccessTo(int userId, ApplicationTask applicationTask);
     }
 
-        public interface ISessionValidator
+    public interface ISessionValidator
     {
         bool IsSessionValid(long logId);
     }
+
 }

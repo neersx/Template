@@ -61,8 +61,4 @@
     <ProjectReference Include="..\DreamWedds.PersistenceLayer.Entities\DreamWedds.PersistenceLayer.Entities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Security\" />
-  </ItemGroup>
-
 </Project>

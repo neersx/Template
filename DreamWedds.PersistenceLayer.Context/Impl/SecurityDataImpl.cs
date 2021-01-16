@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DreamWedds.CommonLayer.Application.AppSettings;
+using DreamWedds.CommonLayer.Application.Model.Security;
+using DreamWedds.CommonLayer.Aspects.Extensions;
 using DreamWedds.CommonLayer.Aspects.Utitlities;
 using DreamWedds.PersistenceLayer.Entities.Entities;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using DreamWedds.PersistenceLayer.Repository.Repository;
+using DreamWedds.PersistenceLayer.Repository.Security;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -13,13 +18,19 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
 {
     public class SecurityDataImpl : ISecurityRepository
     {
+        //readonly Func<DateTime> _clock;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AdminDbContext _dbContext;
         private readonly IAsyncRepository<UserMaster> _userRepository;
         private readonly AccountSettings _accountSettings;
-        public SecurityDataImpl(AdminDbContext dbContext, IAsyncRepository<UserMaster> userRepository, IOptions<AccountSettings> accountSettings)
+        readonly ITaskSecurityProviderCache _taskSecurityProviderCache;
+        public SecurityDataImpl(AdminDbContext dbContext, IAsyncRepository<UserMaster> userRepository, IOptions<AccountSettings> accountSettings, IHttpContextAccessor httpContextAccessor, ITaskSecurityProviderCache taskSecurityProviderCache)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
+            _httpContextAccessor = httpContextAccessor;
+            _taskSecurityProviderCache = taskSecurityProviderCache;
+            // _clock = clock;
             _accountSettings = accountSettings.Value;
         }
 
@@ -34,6 +45,47 @@ namespace DreamWedds.PersistenceLayer.Repository.Impl
                 isSuccess = await _dbContext.SaveChangesAsync() > 0;
             }
             return isSuccess;
+        }
+
+        public IEnumerable<ValidSecurityTask> ListAvailableTasks(int? userId = null)
+        {
+            return AvailableTasks(userId).Values;
+        }
+
+        IDictionary<short, ValidSecurityTask> AvailableTasks(int? userId = null)
+        {
+            var identityId = userId ?? _httpContextAccessor.HttpContext.User.GetLoggedInUserId<int>();
+            var result = _taskSecurityProviderCache.Resolve(x =>
+            {
+                return AvailableTasksFromDb(identityId)
+                    .ToDictionary(k => k.TaskId, v => v);
+            }, identityId);
+
+            return result;
+        }
+
+        IEnumerable<ValidSecurityTask> AvailableTasksFromDb(int userId)
+        {
+            //var today = _clock().Date;
+
+            var task = new PermissionsGrantedItem { ObjectIntegerKey = -2, CanDelete = false, CanExecute = true, CanInsert = false, CanUpdate = true};
+            var tasks = new List<PermissionsGrantedItem>();
+            tasks.Add(task);
+            var result = new List<ValidSecurityTask>();
+            foreach (var t in tasks)
+            {
+                var tk = new ValidSecurityTask
+                {
+                    TaskId = (short) t.ObjectIntegerKey,
+                    CanInsert = t.CanInsert,
+                    CanUpdate = t.CanUpdate,
+                    CanDelete = t.CanDelete,
+                    CanExecute = t.CanExecute
+                };
+                result.Add(tk);
+            }
+
+            return result;
         }
 
         public async Task<bool> ValidateGuidAsync(string guid)

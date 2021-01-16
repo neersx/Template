@@ -2,6 +2,7 @@
 using DreamWedds.PersistenceLayer.Repository.Impl;
 using DreamWedds.PersistenceLayer.Repository.PersistenceServices;
 using DreamWedds.PersistenceLayer.Repository.Repository;
+using DreamWedds.PersistenceLayer.Repository.Security;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamWedds.PersistenceLayer.Repository
@@ -14,6 +15,7 @@ namespace DreamWedds.PersistenceLayer.Repository
             services.AddScoped<IUserRepository, UserDataImpl>();
             services.AddScoped<IEmailRepository, EmailDataImpl>();
             services.AddScoped<ISecurityRepository, SecurityDataImpl>();
+            services.AddScoped<ITaskSecurityProviderCache, TaskSecurityProviderCache>();
         }
     }
 }
