@@ -22,6 +22,7 @@ namespace AdminProject.CommonLayer.Infrastructure
             services.AddScoped(typeof(IAsyncRepository<>), typeof(Repository<>));
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddRepositoryDependency();
+            services.AddScoped<ICommonQueryService, CommonQueryService>();
             services.AddTransient<ITokenClaimsService, IdentityTokenClaimService>();
             services.AddScoped<ITaskAuthorisation, TaskAuthorisation>();
             services.AddScoped<ITaskSecurityProvider, TaskSecurityProvider>();

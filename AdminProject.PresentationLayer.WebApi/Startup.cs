@@ -35,6 +35,10 @@ namespace AdminProject.PresentationLayer.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
             #region Add Application  CORS
 
             services.AddCors(options => options.AddPolicy("Cors", builder =>
