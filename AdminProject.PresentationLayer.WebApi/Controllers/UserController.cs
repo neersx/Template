@@ -1,8 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AdminProject.PresentationLayer.WebApi.Helpers;
 using AdminProject.CommonLayer.Application.DTO;
 using AdminProject.CommonLayer.Application.Interfaces;
 using AdminProject.CommonLayer.Aspects.Extensions;
+using AdminProject.CommonLayer.Aspects.Models;
+using AdminProject.CommonLayer.Infrastructure;
+using AdminProject.CommonLayer.Infrastructure.Extensions;
 using AdminProject.CommonLayer.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,33 +15,36 @@ using AuthorizeAttribute = Microsoft.AspNetCore.Authorization.AuthorizeAttribute
 namespace AdminProject.PresentationLayer.WebApi.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("api/user")]
     public class UserController : ControllerBase
     {
 
         private readonly IUserService _userBusinessInstance;
         private readonly ILogger<UserController> _logger;
+        readonly ICommonQueryService _commonQueryService;
 
-        public UserController(ILogger<UserController> logger, IUserService userBusinessInstance)
+        public UserController(ILogger<UserController> logger, IUserService userBusinessInstance, ICommonQueryService commonQueryService)
         {
             _userBusinessInstance = userBusinessInstance;
             _logger = logger;
+            _commonQueryService = commonQueryService ?? throw new ArgumentNullException("commonQueryService");
         }
 
 
         [HttpGet]
-        [RequiresAccessTo(ApplicationTask.AllowedAccessAlways)]
-        [Authorize(Policy = "TaskSecurity")]
+        //[RequiresAccessTo(ApplicationTask.AllowedAccessAlways)]
+        //[Authorize(Policy = "TaskSecurity")]
         [Route("all-users")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<ActionResult<PagedResults>> GetAllUsers([ModelBinder(BinderType = typeof(JsonQueryBinder), Name = "params")] CommonQueryParameters qp = null)
         {
+            var queryParameters = qp ?? new CommonQueryParameters();
             var userId = User.GetLoggedInUserId<string>();
             var user = await _userBusinessInstance.GetAllUsers();
+            var r = _commonQueryService.Filter(user, queryParameters).AsPagedResults(queryParameters);
             if (user == null) throw new AppException("No User found for: " + userId);
-
-            return Ok(user);
-
+            var result = new PagedResults(r.Data, r.Pagination.Total);
+            return Ok(result);
         }
 
         [HttpGet("{UserId}")]
